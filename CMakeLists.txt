@@ -9,4 +9,4 @@ add_executable(ex1
         main23a1.cpp
         wet1util.h
         worldcup23a1.cpp
-        worldcup23a1.h)
+        worldcup23a1.h Player.cpp Player.h)
