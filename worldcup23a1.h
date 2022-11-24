@@ -16,12 +16,14 @@
 #define WORLDCUP23A1_H_
 
 #include "wet1util.h"
+#include "Dictionary.h"
+#include "Team.h"
+#include "Player.h"
 
 class world_cup_t {
 private:
-	//
-	// Here you may add anything you want
-	//
+    Dictionary<int, Team*> m_dict_of_teams;
+    int m_teams_total;
 	
 public:
 	// <DO-NOT-MODIFY> {

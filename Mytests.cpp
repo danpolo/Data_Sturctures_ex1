@@ -3,6 +3,7 @@
 //
 
 #include "Dictionary.h"
+#include "Player.h"
 
 
 int main()
@@ -34,7 +35,7 @@ int main()
     dict2.insert(v4.getPlayerId(), &v4);
     dict2.insert(v5.getPlayerId(), &v5);
     dict2.print();
-    dict2.remove(v1.getPlayerId(), &v1);
+    dict2.remove(v4.getPlayerId(), &v4);
     std::cout << "level 1" << std::endl;
     dict2.print();
 }

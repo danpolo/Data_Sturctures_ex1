@@ -1,8 +1,9 @@
 #include "worldcup23a1.h"
 
-world_cup_t::world_cup_t()
+world_cup_t::world_cup_t(): m_dict_of_teams(Dictionary<int, Team*>(true)),
+                            m_teams_total(0)
 {
-	// TODO: Your code goes here
+
 }
 
 world_cup_t::~world_cup_t()
@@ -13,14 +14,36 @@ world_cup_t::~world_cup_t()
 
 StatusType world_cup_t::add_team(int teamId, int points)
 {
-	// TODO: Your code goes here
-	return StatusType::SUCCESS;
+    if ((teamId <= 0) || (points < 0)){
+        return StatusType::INVALID_INPUT;
+    }
+    try {
+        Team *added_team = new Team(teamId, points);
+        StatusType ans = m_dict_of_teams.insert(teamId, added_team);
+        if (ans == StatusType::SUCCESS){
+            m_teams_total += 1;
+        }
+        return ans;
+    }
+    catch (std::bad_alloc&){
+        return StatusType::ALLOCATION_ERROR;
+    }
 }
 
 StatusType world_cup_t::remove_team(int teamId)
 {
-	// TODO: Your code goes here
-	return StatusType::FAILURE;
+    if (teamId <= 0){
+        return StatusType::INVALID_INPUT;
+    }
+    Team* curr = m_dict_of_teams.find(teamId);
+    if (curr->numberOfPlayers() > 0){
+        return StatusType::FAILURE;
+    }
+    StatusType ans = m_dict_of_teams.remove(teamId, curr);
+    if (ans == StatusType::SUCCESS){
+        m_teams_total -= 1;
+    }
+	return ans;
 }
 
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,

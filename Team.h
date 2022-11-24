@@ -5,12 +5,13 @@
 #ifndef EX1_TEAM_H
 #define EX1_TEAM_H
 
+#include "Dictionary.h"
+#include "Player.h"
 
 class Team
 {
 public:
-    Team(int teamID);
-
+    Team(int teamID, int points = 0);
     // StatusType add_player(int playerID, int games_played, int goals, int cards, bool goalKeeper)
     // StatusType remove_player()
 
@@ -21,6 +22,8 @@ public:
     void addStrength(int strength);
     void addGamesPlayed();
     int numberOfPlayers() const;
+    bool operator>(const Team& other) const;
+    bool operator==(const Team& other) const;
     //StatusType getAllPlayers(* const ouput);
     //Output_t<int> getTopScorer();
 
@@ -33,9 +36,11 @@ private:
     int m_games_played;
     int m_number_of_players;
     bool m_goalKeeper_exist;
+    Dictionary<int, Player*> m_dict_of_players_in_team;
     // Player m_top_scorer;
     // dictionary of players
 };
-
+bool operator!=(const Team& v1, const Team& v2);
+bool operator<(const Team& v1, const Team& v2);
 
 #endif //EX1_TEAM_H

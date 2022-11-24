@@ -9,13 +9,6 @@ public:
     Player(int player_id, int goals, int cards, int games_played, bool is_GK);
     ~Player() = default;
     Player& operator=(const Player& other) = default;
-
-    bool operator>(const Player& other) const;
-    bool operator<(const Player& other) const;
-
-private:
-    int player_id;
-public:
     int getPlayerId() const;
 
     int getGoals() const;
@@ -26,7 +19,11 @@ public:
 
     bool isGk() const;
 
+    bool operator>(const Player& other) const;
+    bool operator<(const Player& other) const;
+
 private:
+    int player_id;
     int goals;
     int cards;
     int games_played;

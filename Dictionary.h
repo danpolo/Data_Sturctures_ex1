@@ -1,19 +1,19 @@
 #ifndef EX1_DICTIONARY_H
 #define EX1_DICTIONARY_H
 
-#include "Team.h"
 #include "wet1util.h"
-#include "Player.h"
 #include <iostream>         //just for check
 
 template<class KEY, class VALUE>
 class Dictionary {
 public:
-    Dictionary(bool is_sorted_by_key);
+    Dictionary(bool is_sorted_by_key) : is_sorted_by_key(is_sorted_by_key),
+                                        root(nullptr), length(0){};
 
     void print();         //just for check
     StatusType insert(KEY key, VALUE value);
     StatusType remove(KEY key, VALUE value);
+    VALUE find(KEY key);
 private:
 
     template<class T, class S>
@@ -104,6 +104,7 @@ private:
                 ro->father->setRight(nullptr);
             }
             delete ro;
+            length -= 1;
             return;
         }
         if (ro->left_son == nullptr) {
@@ -115,6 +116,7 @@ private:
                 ro->right_son->setFather(ro->father);
             }
             delete ro;
+            length -= 1;
             return;
         }
         if (ro->right_son == nullptr){
@@ -126,6 +128,7 @@ private:
                 ro->left_son->setFather(ro->father);
             }
             delete ro;
+            length -= 1;
             return;
         }
         Node<KEY, VALUE>* nearest = ro->right_son;
@@ -150,12 +153,42 @@ private:
         std::cout << ro->key << std::endl;
         printAll(ro->right_son);
     }
+
+
+    StatusType insertKey(KEY key, VALUE value){
+        Node<KEY, VALUE>* temp = findNodeByKey(root, key);
+        Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, temp);
+        if (key == temp->key){
+            delete son;
+            return StatusType::FAILURE;
+        }
+        if (key < temp->key){
+            temp->setLeft(son);
+        }
+        else{
+            temp->setRight(son);
+        }
+        length += 1;
+        return StatusType::SUCCESS;
+    }
+
+    StatusType insertValue(KEY key, VALUE value){
+        Node<KEY, VALUE>* temp = findNodeByValue(root, value);
+        Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, temp);
+        if (*value < *temp->value){
+            temp->setLeft(son);
+        }
+        else{
+            temp->setRight(son);
+        }
+        length += 1;
+        return StatusType::SUCCESS;
+    }
 };
 
-template<class KEY, class VALUE>
-Dictionary<KEY, VALUE>::Dictionary(bool is_sorted_by_key) : length(0), root(nullptr),
-                                    is_sorted_by_key(is_sorted_by_key){
-}
+//template<class KEY, class VALUE>
+//Dictionary<KEY, VALUE>::Dictionary(bool is_sorted_by_key) : is_sorted_by_key(is_sorted_by_key),
+//                                                            root(nullptr), length(0){}
 
 template<class KEY, class VALUE>
 StatusType Dictionary<KEY, VALUE>::insert(KEY key, VALUE value) {
@@ -165,32 +198,11 @@ StatusType Dictionary<KEY, VALUE>::insert(KEY key, VALUE value) {
             return StatusType::SUCCESS;
         }
         else {
-            Node<KEY, VALUE>* current_node = root;
             if (is_sorted_by_key){
-                Node<KEY, VALUE>* temp = findNodeByKey(current_node, key);
-                Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, temp);
-                if (key == temp->key){
-                    delete son;
-                    return StatusType::FAILURE;
-                }
-                if (key < temp->key){
-                    temp->setLeft(son);
-                }
-                else{
-                    temp->setRight(son);
-                }
-                return StatusType::SUCCESS;
+                return insertKey(key, value);
             }
             else{
-                Node<KEY, VALUE>* temp = findNodeByValue(current_node, value);
-                Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, temp);
-                if (*value < *temp->value){
-                    temp->setLeft(son);
-                }
-                else{
-                    temp->setRight(son);
-                }
-                return StatusType::SUCCESS;
+                return insertValue(key, value);
             }
         }
     }
@@ -198,6 +210,7 @@ StatusType Dictionary<KEY, VALUE>::insert(KEY key, VALUE value) {
         return StatusType::ALLOCATION_ERROR;
     }
 }
+
 
 template<class KEY, class VALUE>
 StatusType Dictionary<KEY, VALUE>::remove(KEY key, VALUE value) {
@@ -216,6 +229,11 @@ StatusType Dictionary<KEY, VALUE>::remove(KEY key, VALUE value) {
     }
     removeNode(temp);
     return StatusType::SUCCESS;
+}
+
+template<class KEY, class VALUE>
+VALUE Dictionary<KEY, VALUE>::find(KEY key) {
+    return findNodeByKey(root, key)->value;
 }
 
 template<class T, class S>
