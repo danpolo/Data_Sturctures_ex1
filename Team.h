@@ -12,16 +12,18 @@ class Team
 {
 public:
     Team(int teamID, int points = 0);
-    // StatusType add_player(int playerID, int games_played, int goals, int cards, bool goalKeeper)
-    // StatusType remove_player()
+    StatusType add_player(int playerID, Player* pl);
+    StatusType remove_player(int playerID);
 
     int valueOfTeam() const;   //points + strength
     int getPoints() const;
     int getStrength() const;
+    int getID() const;
     void addPoints(int points);
     void addStrength(int strength);
     void addGamesPlayed();
     int numberOfPlayers() const;
+    bool isGoalKeeperExists() const;
     bool operator>(const Team& other) const;
     bool operator==(const Team& other) const;
     //StatusType getAllPlayers(* const ouput);
@@ -35,7 +37,7 @@ private:
     int m_strength;
     int m_games_played;
     int m_number_of_players;
-    bool m_goalKeeper_exist;
+    int m_goalKeeper_exist;
     Dictionary<int, Player*> m_dict_of_players_in_team;
     // Player m_top_scorer;
     // dictionary of players

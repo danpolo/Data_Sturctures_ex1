@@ -1,7 +1,10 @@
 #include "worldcup23a1.h"
 
 world_cup_t::world_cup_t(): m_dict_of_teams(Dictionary<int, Team*>(true)),
-                            m_teams_total(0)
+                            m_dict_of_active_teams(Dictionary<int, Team*>(true)),
+                            m_dict_of_players_by_value(Dictionary<int, Player*>(false)),
+                            m_dict_of_players_by_key(Dictionary<int, Player*>(true)),
+                            m_teams_total(0),m_active_teams_total(0), m_players_total(0)
 {
 
 }
@@ -22,6 +25,9 @@ StatusType world_cup_t::add_team(int teamId, int points)
         StatusType ans = m_dict_of_teams.insert(teamId, added_team);
         if (ans == StatusType::SUCCESS){
             m_teams_total += 1;
+        }
+        else{
+            delete added_team;
         }
         return ans;
     }
@@ -49,20 +55,86 @@ StatusType world_cup_t::remove_team(int teamId)
 StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
                                    int goals, int cards, bool goalKeeper)
 {
-	// TODO: Your code goes here
+    if ((playerId <= 0) || (teamId <= 0) || (gamesPlayed < 0) || (goals < 0) || (cards < 0)){
+        return StatusType::INVALID_INPUT;
+    }
+    if ((gamesPlayed == 0) && ((cards > 0) || (goals > 0))){
+        return StatusType::INVALID_INPUT;
+    }
+    try{
+        Player* temp_player = new Player(playerId, teamId, goals, cards, gamesPlayed, goalKeeper);
+        StatusType ans1 = m_dict_of_players_by_key.insert(playerId, temp_player);
+        if (ans1 != StatusType::SUCCESS){
+            delete temp_player;
+            return ans1;
+        }
+        ans1 = m_dict_of_players_by_value.insert(playerId, temp_player);
+        if (ans1 != StatusType::SUCCESS){
+            delete temp_player;
+            return ans1;
+        }
+        Team* temp_team = m_dict_of_teams.find(teamId);
+        if (temp_team->getID() != teamId){
+            return StatusType::FAILURE;
+        }
+        temp_team->add_player(playerId, temp_player);
+        if (temp_team->numberOfPlayers() == 1){
+            ans1 = m_dict_of_active_teams.insert(teamId, temp_team);
+            if (ans1 != StatusType::SUCCESS){
+                return ans1;
+            }
+            m_active_teams_total += 1;
+        }
+        m_players_total += 1;
+    }
+    catch (std::bad_alloc&){
+        return StatusType::ALLOCATION_ERROR;
+    }
 	return StatusType::SUCCESS;
 }
 
 StatusType world_cup_t::remove_player(int playerId)
 {
-	// TODO: Your code goes here
-	return StatusType::SUCCESS;
+	if (playerId <= 0){
+        return StatusType::INVALID_INPUT;
+    }
+    Player* temp_player = m_dict_of_players_by_key.find(playerId);
+    if (temp_player->getPlayerId() != playerId){
+        return StatusType::FAILURE;
+    }
+    StatusType ans = m_dict_of_players_by_value.remove(playerId, temp_player);
+    if (ans != StatusType::SUCCESS){
+        return ans;
+    }
+    Team* temp_team = m_dict_of_active_teams.find(temp_player->getTeamID());
+    //Maybe here there's a problem with complexity, but active_teams maybe solves it
+    ans = temp_team->remove_player(playerId);
+    if (ans != StatusType::SUCCESS){
+        return ans;
+    }
+    if (temp_team->numberOfPlayers() == 0){
+        m_dict_of_active_teams.remove(temp_team->getID(), temp_team);
+        m_active_teams_total -= 1;
+    }
+    m_players_total -= 1;
+    return ans;
 }
 
 StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
                                         int scoredGoals, int cardsReceived)
 {
-	// TODO: Your code goes here
+    if ((playerId <= 0) || (gamesPlayed < 0) || (scoredGoals < 0) || (cardsReceived < 0)){
+        return StatusType::INVALID_INPUT;
+    }
+	Player* temp_player = m_dict_of_players_by_key.find(playerId);
+    if (temp_player->getPlayerId() != playerId){
+        return StatusType::FAILURE;
+    }
+    temp_player->addGoals(scoredGoals);
+    temp_player->addGamesPlayed(gamesPlayed); // check if the value is zero, then need to set not add
+    temp_player->addCards(cardsReceived);
+    Team* temp_team = m_dict_of_active_teams.find(temp_player->getTeamID());
+    temp_team->addStrength(temp_player->getGoals() - temp_player->getCards());
 	return StatusType::SUCCESS;
 }
 

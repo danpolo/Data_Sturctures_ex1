@@ -23,7 +23,12 @@
 class world_cup_t {
 private:
     Dictionary<int, Team*> m_dict_of_teams;
+    Dictionary<int, Team*> m_dict_of_active_teams;     //teams with players
+    Dictionary<int, Player*> m_dict_of_players_by_value;
+    Dictionary<int, Player*> m_dict_of_players_by_key;
     int m_teams_total;
+    int m_active_teams_total;
+    int m_players_total;
 	
 public:
 	// <DO-NOT-MODIFY> {
