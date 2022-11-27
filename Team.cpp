@@ -58,13 +58,15 @@ StatusType Team::remove_player(int playerID) {
     if (temp_player->getPlayerId() != playerID){
         return StatusType::FAILURE;
     }
+    int player_strength = temp_player->getCards() - temp_player->getGoals();
+    bool is_player_gk = temp_player->isGk();
     StatusType ans = m_dict_of_players_in_team.remove(playerID, temp_player);
     if (ans != StatusType::SUCCESS){
         return ans;
     }
     m_number_of_players -= 1;
-    addStrength(temp_player->getCards() - temp_player->getGoals());
-    if (temp_player->isGk()){
+    addStrength(player_strength);
+    if (is_player_gk){
         m_goalKeeper_exist -= 1;
     }
     return ans;

@@ -102,11 +102,12 @@ StatusType world_cup_t::remove_player(int playerId)
     if (temp_player->getPlayerId() != playerId){
         return StatusType::FAILURE;
     }
+    int player_team_id = temp_player->getTeamID();
     StatusType ans = m_dict_of_players_by_value.remove(playerId, temp_player);
     if (ans != StatusType::SUCCESS){
         return ans;
     }
-    Team* temp_team = m_dict_of_active_teams.find(temp_player->getTeamID());
+    Team* temp_team = m_dict_of_active_teams.find(player_team_id);
     //Maybe here there's a problem with complexity, but active_teams maybe solves it
     ans = temp_team->remove_player(playerId);
     if (ans != StatusType::SUCCESS){
