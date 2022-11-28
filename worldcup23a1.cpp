@@ -99,7 +99,7 @@ StatusType world_cup_t::remove_player(int playerId)
         return StatusType::INVALID_INPUT;
     }
     Player* temp_player = m_dict_of_players_by_key.find(playerId);
-    if (temp_player->getPlayerId() != playerId){
+    if (temp_player == nullptr || temp_player->getPlayerId() != playerId){
         return StatusType::FAILURE;
     }
     int player_team_id = temp_player->getTeamID();

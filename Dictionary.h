@@ -369,6 +369,10 @@ StatusType Dictionary<KEY, VALUE>::remove(KEY key, VALUE value) {
 
 template<class KEY, class VALUE>
 VALUE Dictionary<KEY, VALUE>::find(KEY key) {
+    Node<KEY, VALUE>* node = findNodeByKey(root, key);
+    if (node == nullptr) {
+        return nullptr;
+    }
     return findNodeByKey(root, key)->value;
 }
 

@@ -4,10 +4,73 @@
 
 #include "Dictionary.h"
 #include "Player.h"
+#include <vector>
 
+#define PRINT_TEST_NAME(test) std::cout << "Running test: " << #test
+
+std::string amendSentence(std::string str) {
+    std::string out;
+    for (int i = 0; i < str.length(); i++) {
+        if (str[i]>='A' && str[i]<='Z') {
+            str[i]=str[i]+32;
+            if (i != 0) {
+                out += " ";
+            }
+            out += str[i];
+        }
+        else {
+            out += str[i];
+        }
+    }
+    return out;
+}
+
+bool findInEmptyDictionaryByKey() {
+    std::cout << "Running test: " << amendSentence(__FUNCTION__);
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    return dict.find(1) == nullptr;
+}
+
+bool findInEmptyDictionaryByValue() {
+    std::cout << "Running test: " << amendSentence(__FUNCTION__);
+    Dictionary<int, int*> dict = Dictionary<int, int*>(false);
+    return dict.find(1) == nullptr;
+}
+
+
+
+bool runTests(const std::vector<bool(*)()>& tests) {
+    bool all_tests_passed = true;
+    for (auto test : tests) {
+        if (test()) {
+            std::cout << " - TEST PASSED" << std::endl;
+        }
+        else {
+            all_tests_passed = false;
+            std::cout << " - TEST FAILED" << std::endl;
+        }
+    }
+    return all_tests_passed;
+}
 
 int main()
 {
+    std::vector<bool(*)()> tests = {&findInEmptyDictionaryByKey, &findInEmptyDictionaryByValue};
+    if (runTests(tests)) {
+        std::cout << "ALL TESTS PASSED!!!" << std::endl;
+    }
+    else {
+        std::cout << "Some of the tests failed" << std::endl;
+    }
+
+    return 0;
+}
+
+
+
+
+
+void generalTest1() {
     std::cout << "Dictionary 1" << std::endl;
     int num[6] = {6,4,8,9,24,3};
     Dictionary<int, int*> dict = Dictionary<int, int*>(false);
@@ -20,9 +83,10 @@ int main()
     dict.print();
     dict.remove(3, &num[2]);
     dict.print();
+}
 
+void generalTest2() {
     std::cout << "Dictionary 2" << std::endl;
-
     Player v1 = Player(1, 1, 3, 5, 2, false);
     Player v2 = Player(2,1,5,2,3,false);
     Player v3 = Player(3,1,5,3,3, false);
