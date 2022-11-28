@@ -4,6 +4,9 @@
 #include "wet1util.h"
 #include <iostream>         //just for check
 
+const int LEAF_HEIGHT = 0;
+const int LEAF_SON_HEIGHT = -1;
+
 template<class KEY, class VALUE>
 class Dictionary {
 public:
@@ -20,8 +23,8 @@ private:
     class Node {
     public:
         Node(T key, S value, Node *father) : key(key), value(value),father(father),
-                                                                                  left_son(nullptr),
-                                                                                  right_son(nullptr){}
+                                             left_son(nullptr), right_son(nullptr), bf_value(0),
+                                             height(LEAF_HEIGHT) {}
         Node(const Node& node) = default;
         Node& operator=(const Node& node) = default;
         ~Node() = default;
@@ -30,18 +33,57 @@ private:
         void setFather(Node *fat) {father = fat;}
         void setKey(T other_key){ key = other_key;}
         void setValue(S other_value){ value = other_value;}
-//        bool isLeaf() {((right_son == nullptr)&&(left_son == nullptr));}
+        void setHeight(int new_height) {height = new_height;}
+        void setBfValue(int new_bf_value) {bf_value = new_bf_value;}
+//      bool isLeaf() {((right_son == nullptr)&&(left_son == nullptr));}
         T key;
         S value;
         Node* father;
         Node* left_son;
         Node* right_son;
+        int bf_value;
+        int height;
     };
 
     bool is_sorted_by_key;
     Node<KEY, VALUE>* root;
     int length;
 
+    int getHeight(Node<KEY, VALUE>* node){
+        if (node == nullptr) {
+            return LEAF_SON_HEIGHT;
+        }
+        int right_son_height = LEAF_SON_HEIGHT;
+        int left_son_height = LEAF_SON_HEIGHT;
+
+        if (node->right_son != nullptr){
+            right_son_height = node->right_son->height;
+        }
+        if (node->left_son != nullptr){
+            left_son_height = node->left_son->height;
+        }
+
+        if (left_son_height > right_son_height) {
+            return left_son_height + 1;
+        }
+        return right_son_height + 1;
+    }
+
+    void updateAncestorsHeight(Node<KEY, VALUE>* node) {
+        int old_height = node->height;
+        node->setHeight(getHeight(node));
+        node->setBfValue(getBfValue(node));
+
+        if (old_height == node->height || node->father == nullptr) {
+            return;
+        }
+
+        updateAncestorsHeight(node->father);
+    }
+
+    int getBfValue(Node<KEY, VALUE>* node) {
+        return getHeight(node->left_son) - getHeight(node->right_son);
+    }
 
     Node<KEY, VALUE>* findNodeByKey(Node<KEY, VALUE>* current_root, KEY key_to_find) {
         if (current_root == nullptr) {
@@ -97,17 +139,29 @@ private:
             return;
         }
         if ((ro->left_son == nullptr)&&(ro->right_son == nullptr)){
+            if (ro->father == nullptr) {
+                delete ro;
+                length -= 1;
+                return;
+            }
             if ((ro->father->left_son != nullptr)&&(ro->father->left_son->key == ro->key)){
                 ro->father->setLeft(nullptr);
             }
             else{
                 ro->father->setRight(nullptr);
             }
+            updateAncestorsHeight(ro->father);
             delete ro;
             length -= 1;
             return;
         }
         if (ro->left_son == nullptr) {
+            if (ro->father == nullptr) {
+                root = ro->right_son;
+                delete ro;
+                length -= 1;
+                return;
+            }
             if ((ro->father->left_son != nullptr) && (ro->father->left_son->key == ro->key)) {
                 ro->father->setLeft(ro->right_son);
                 ro->right_son->setFather(ro->father);
@@ -115,11 +169,18 @@ private:
                 ro->father->setRight(ro->right_son);
                 ro->right_son->setFather(ro->father);
             }
+            updateAncestorsHeight(ro->father);
             delete ro;
             length -= 1;
             return;
         }
         if (ro->right_son == nullptr){
+            if (ro->father == nullptr) {
+                root = ro->left_son;
+                delete ro;
+                length -= 1;
+                return;
+            }
             if ((ro->father->left_son != nullptr) && (ro->father->left_son->key == ro->key)) {
                 ro->father->setLeft(ro->left_son);
                 ro->left_son->setFather(ro->father);
@@ -127,6 +188,7 @@ private:
                 ro->father->setRight(ro->left_son);
                 ro->left_son->setFather(ro->father);
             }
+            updateAncestorsHeight(ro->father);
             delete ro;
             length -= 1;
             return;
@@ -150,37 +212,39 @@ private:
             return;
         }
         printAll(ro->left_son);
-        std::cout << ro->key << std::endl;
+        std::cout << "Key: " << ro->key << ", Height: " << ro->height << ", BF: " << ro->bf_value <<
+        std::endl;
         printAll(ro->right_son);
     }
 
 
     StatusType insertKey(KEY key, VALUE value){
-        Node<KEY, VALUE>* temp = findNodeByKey(root, key);
-        Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, temp);
-        if (key == temp->key){
-            delete son;
+        Node<KEY, VALUE>* optional_father = findNodeByKey(root, key);
+        if (key == optional_father->key){
             return StatusType::FAILURE;
         }
-        if (key < temp->key){
-            temp->setLeft(son);
+        Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, optional_father);
+        if (key < optional_father->key){
+            optional_father->setLeft(son);
         }
         else{
-            temp->setRight(son);
+            optional_father->setRight(son);
         }
+        updateAncestorsHeight(optional_father);
         length += 1;
         return StatusType::SUCCESS;
     }
 
     StatusType insertValue(KEY key, VALUE value){
-        Node<KEY, VALUE>* temp = findNodeByValue(root, value);
-        Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, temp);
-        if (*value < *temp->value){
-            temp->setLeft(son);
+        Node<KEY, VALUE>* optional_father = findNodeByValue(root, value);
+        Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, optional_father);
+        if (*value < *optional_father->value){
+            optional_father->setLeft(son);
         }
         else{
-            temp->setRight(son);
+            optional_father->setRight(son);
         }
+        updateAncestorsHeight(optional_father);
         length += 1;
         return StatusType::SUCCESS;
     }
