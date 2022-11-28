@@ -23,11 +23,11 @@ int main()
 
     std::cout << "Dictionary 2" << std::endl;
 
-    Player v1 = Player(1, 3, 5, 2, false);
-    Player v2 = Player(2,5,2,3,false);
-    Player v3 = Player(3,5,3,3, false);
-    Player v4 = Player(4,3,5,1, false);
-    Player v5 = Player(5,3,7,2, false);
+    Player v1 = Player(1, 1, 3, 5, 2, false);
+    Player v2 = Player(2,1,5,2,3,false);
+    Player v3 = Player(3,1,5,3,3, false);
+    Player v4 = Player(4,1,3,5,1, false);
+    Player v5 = Player(5,1,3,7,2, false);
     Dictionary<int, Player*> dict2 = Dictionary<int, Player*>(false);
     dict2.insert(v1.getPlayerId(), &v1);
     dict2.insert(v2.getPlayerId(), &v2);
