@@ -69,22 +69,94 @@ private:
         return right_son_height + 1;
     }
 
-    void updateAncestorsHeight(Node<KEY, VALUE>* node) {
+    void stabilizeTree(Node<KEY, VALUE>* node) {
         int old_height = node->height;
         node->setHeight(getHeight(node));
         node->setBfValue(getBfValue(node));
-
+        if (node->bf_value == 2) {
+            if (node->left_son->bf_value == -1) {
+                LRRotation(node);
+            }
+            else {
+                LLRotation(node);
+            }
+        }
+        else if (node->bf_value == -2) {
+            if (node->right_son->bf_value == 1) {
+                RLRotation(node);
+            }
+            else {
+                RRRotation(node);
+            }
+        }
+        node->setHeight(getHeight(node));
+        node->setBfValue(getBfValue(node));
         if (old_height == node->height || node->father == nullptr) {
             return;
         }
 
-        updateAncestorsHeight(node->father);
+        stabilizeTree(node->father);
     }
 
     int getBfValue(Node<KEY, VALUE>* node) {
         return getHeight(node->left_son) - getHeight(node->right_son);
     }
 
+    void LLRotation(Node<KEY, VALUE>* node) {
+        Node<KEY, VALUE>* right_son_of_left_son = node->left_son->right_son;
+        Node<KEY, VALUE>* father = node->father;
+
+        node->setFather(node->left_son);
+        node->left_son->setRight(node);
+        node->setLeft(right_son_of_left_son);
+
+        if (father != nullptr) {
+            if (father->right_son->key == node->key) {
+                father->setRight(node->father);
+            }
+            else {
+                father->setLeft(node->father);
+            }
+        }
+
+        if (root->key == node->key) {
+            root = node->father;
+        }
+    }
+
+
+    void RRRotation(Node<KEY, VALUE>* node) {
+        Node<KEY, VALUE>* left_son_of_right_son = node->right_son->left_son;
+        Node<KEY, VALUE>* father = node->father;
+
+        node->setFather(node->right_son);
+        node->right_son->setLeft(node);
+        node->setRight(left_son_of_right_son);
+
+        if (father != nullptr) {
+            if (father->right_son->key == node->key) {
+                father->setRight(node->father);
+            }
+            else {
+                father->setLeft(node->father);
+            }
+        }
+
+        if (root->key == node->key) {
+            root = node->father;
+        }
+    }
+
+    void RLRotation(Node<KEY, VALUE>* node) {
+        LLRotation(node->right_son);
+        RRRotation(node);
+    }
+
+    void LRRotation(Node<KEY, VALUE>* node) {
+        RRRotation(node->left_son);
+        LLRotation(node);
+    }
+    
     Node<KEY, VALUE>* findNodeByKey(Node<KEY, VALUE>* current_root, KEY key_to_find) {
         if (current_root == nullptr) {
             return nullptr;
@@ -150,7 +222,7 @@ private:
             else{
                 ro->father->setRight(nullptr);
             }
-            updateAncestorsHeight(ro->father);
+            stabilizeTree(ro->father);
             delete ro;
             length -= 1;
             return;
@@ -169,7 +241,7 @@ private:
                 ro->father->setRight(ro->right_son);
                 ro->right_son->setFather(ro->father);
             }
-            updateAncestorsHeight(ro->father);
+            stabilizeTree(ro->father);
             delete ro;
             length -= 1;
             return;
@@ -188,7 +260,7 @@ private:
                 ro->father->setRight(ro->left_son);
                 ro->left_son->setFather(ro->father);
             }
-            updateAncestorsHeight(ro->father);
+            stabilizeTree(ro->father);
             delete ro;
             length -= 1;
             return;
@@ -230,7 +302,7 @@ private:
         else{
             optional_father->setRight(son);
         }
-        updateAncestorsHeight(optional_father);
+        stabilizeTree(optional_father);
         length += 1;
         return StatusType::SUCCESS;
     }
@@ -244,7 +316,7 @@ private:
         else{
             optional_father->setRight(son);
         }
-        updateAncestorsHeight(optional_father);
+        stabilizeTree(optional_father);
         length += 1;
         return StatusType::SUCCESS;
     }
