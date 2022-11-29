@@ -1,16 +1,17 @@
 //
 // Created by itayi on 21/11/2022.
 //
-
+#include <windows.h>
 #include "Dictionary.h"
 #include "Player.h"
 #include <vector>
 
-#define PRINT_TEST_NAME(test) std::cout << "Running test: " << #test
+const int MAX_LINE_LENGTH = 50;
 
-std::string amendSentence(std::string str) {
+void amendSentence(std::string str) {
     std::string out;
-    for (int i = 0; i < str.length(); i++) {
+    out += str[0] - 32;
+    for (int i = 1; i < str.length(); i++) {
         if (str[i]>='A' && str[i]<='Z') {
             str[i]=str[i]+32;
             if (i != 0) {
@@ -22,45 +23,48 @@ std::string amendSentence(std::string str) {
             out += str[i];
         }
     }
-    return out;
+    std::cout << "Running test: " << out << std::string(MAX_LINE_LENGTH - out.length(), ' ');
 }
 
 bool findInEmptyDictionaryByKey() {
-    std::cout << "Running test: " << amendSentence(__FUNCTION__);
+    amendSentence(__FUNCTION__);
     Dictionary<int, int*> dict = Dictionary<int, int*>(true);
     return dict.find(1) == nullptr;
 }
 
 bool findInEmptyDictionaryByValue() {
-    std::cout << "Running test: " << amendSentence(__FUNCTION__);
+    amendSentence(__FUNCTION__);
     Dictionary<int, int*> dict = Dictionary<int, int*>(false);
     return dict.find(1) == nullptr;
 }
-
 
 
 bool runTests(const std::vector<bool(*)()>& tests) {
     bool all_tests_passed = true;
     for (auto test : tests) {
         if (test()) {
-            std::cout << " - TEST PASSED" << std::endl;
+            std::cout << "\033[1;32m - TEST PASSED\033[0m" << std::endl;
         }
         else {
             all_tests_passed = false;
-            std::cout << " - TEST FAILED" << std::endl;
+            std::cout << "\033[1;31m - TEST FAILED\033[0m" << std::endl;
         }
     }
     return all_tests_passed;
 }
 
-int main()
-{
+int main() {
+    std::cout << "Ignore this (Its for the colors)-> ";
+    system(("chcp " + std::to_string(CP_UTF8)).c_str());
+    std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
     std::vector<bool(*)()> tests = {&findInEmptyDictionaryByKey, &findInEmptyDictionaryByValue};
     if (runTests(tests)) {
-        std::cout << "ALL TESTS PASSED!!!" << std::endl;
+        std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
+        std::cout << "\033[1;32mALL TESTS PASSED!!!\033[0m" << std::endl;
     }
     else {
-        std::cout << "Some of the tests failed" << std::endl;
+        std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
+        std::cout << "\033[1;31mSome of the tests failed\033[0m" << std::endl;
     }
 
     return 0;
