@@ -10,13 +10,18 @@ const int LEAF_SON_HEIGHT = -1;
 template<class KEY, class VALUE>
 class Dictionary {
 public:
-    Dictionary(bool is_sorted_by_key) : is_sorted_by_key(is_sorted_by_key),
-                                        root(nullptr), length(0){};
+    Dictionary(bool is_sorted_by_key) : is_sorted_by_key(is_sorted_by_key), root(nullptr),
+                                        counter_for_arrays(0), length(0){};
 
     void print();         //just for check
     StatusType insert(KEY key, VALUE value);
     StatusType remove(KEY key, VALUE value);
+    VALUE* inorderNodesByValue();
+    KEY* inorderNodesByKey();
     VALUE find(KEY key);
+    VALUE findFatherValue(VALUE value);
+    bool isExist(KEY key, VALUE value = nullptr);
+//    VALUE getFarRight();
 private:
 
     template<class T, class S>
@@ -47,6 +52,7 @@ private:
 
     bool is_sorted_by_key;
     Node<KEY, VALUE>* root;
+    int counter_for_arrays;
     int length;
 
     int getHeight(Node<KEY, VALUE>* node){
@@ -209,6 +215,25 @@ private:
         return findNodeByValue(current_root->right_son, value_to_find);
     }
 
+    void getAllNodes(Node<KEY, VALUE>* curr, VALUE* ans){
+        if (curr == nullptr){
+            return;
+        }
+        getAllNodes(curr->left_son, ans);
+        ans[counter_for_arrays] = curr->value;
+        counter_for_arrays += 1;
+        getAllNodes(curr->right_son, ans);
+    }
+
+    void getAllNodesByKey(Node<KEY, VALUE>* curr, KEY* ans){
+        if (curr == nullptr){
+            return;
+        }
+        getAllNodesByKey(curr->left_son, ans);
+        ans[counter_for_arrays] = curr->key;
+        counter_for_arrays += 1;
+        getAllNodesByKey(curr->right_son, ans);
+    }
 
     void removeNode(Node<KEY, VALUE>* ro){
         if (ro == nullptr){
@@ -232,18 +257,18 @@ private:
             return;
         }
         if (ro->left_son == nullptr) {
-            if (ro->father == nullptr) {
+            if (ro->father == nullptr){
+                ro->right_son->setFather(nullptr);
                 root = ro->right_son;
-                delete ro;
-                length -= 1;
-                return;
             }
-            if ((ro->father->left_son != nullptr) && (ro->father->left_son->key == ro->key)) {
-                ro->father->setLeft(ro->right_son);
-                ro->right_son->setFather(ro->father);
-            } else {
-                ro->father->setRight(ro->right_son);
-                ro->right_son->setFather(ro->father);
+            else {
+                if ((ro->father->left_son != nullptr) && (ro->father->left_son->key == ro->key)) {
+                    ro->father->setLeft(ro->right_son);
+                    ro->right_son->setFather(ro->father);
+                } else {
+                    ro->father->setRight(ro->right_son);
+                    ro->right_son->setFather(ro->father);
+                }
             }
             stabilizeTree(ro->father);
             delete ro;
@@ -251,18 +276,18 @@ private:
             return;
         }
         if (ro->right_son == nullptr){
-            if (ro->father == nullptr) {
+            if (ro->father == nullptr){
+                ro->left_son->setFather(nullptr);
                 root = ro->left_son;
-                delete ro;
-                length -= 1;
-                return;
             }
-            if ((ro->father->left_son != nullptr) && (ro->father->left_son->key == ro->key)) {
-                ro->father->setLeft(ro->left_son);
-                ro->left_son->setFather(ro->father);
-            } else {
-                ro->father->setRight(ro->left_son);
-                ro->left_son->setFather(ro->father);
+            else {
+                if ((ro->father->left_son != nullptr) && (ro->father->left_son->key == ro->key)) {
+                    ro->father->setLeft(ro->left_son);
+                    ro->left_son->setFather(ro->father);
+                } else {
+                    ro->father->setRight(ro->left_son);
+                    ro->left_son->setFather(ro->father);
+                }
             }
             stabilizeTree(ro->father);
             delete ro;
@@ -335,6 +360,7 @@ StatusType Dictionary<KEY, VALUE>::insert(KEY key, VALUE value) {
     try {
         if (root == nullptr) {
             root = new Node<KEY, VALUE>(key, value, nullptr);
+            length++;
             return StatusType::SUCCESS;
         }
         else {
@@ -380,9 +406,62 @@ VALUE Dictionary<KEY, VALUE>::find(KEY key) {
     return findNodeByKey(root, key)->value;
 }
 
+template<class KEY, class VALUE>
+VALUE Dictionary<KEY, VALUE>::findFatherValue(VALUE value) {
+    Node<KEY, VALUE>* temp = findNodeByValue(root, value)->father;
+    if (temp == nullptr){
+        return nullptr;
+    }
+    return temp->value;
+}
+
+template<class KEY, class VALUE>
+bool Dictionary<KEY, VALUE>::isExist(KEY key, VALUE value) {
+    if (is_sorted_by_key) {
+        Node<KEY, VALUE> *temp = findNodeByKey(root, key);
+        if (temp->key == key) {
+            return true;
+        }
+        return false;
+    }
+    Node<KEY, VALUE> *temp = findNodeByValue(root, value);
+    if (temp->key == key){
+        return true;
+    }
+    return false;
+}
+
+//template<class KEY, class VALUE>
+//VALUE Dictionary<KEY, VALUE>::getFarRight() {
+//    Node<KEY, VALUE>* temp = root;
+//    if (temp == nullptr){
+//        return nullptr;
+//    }
+//    while (temp->right_son != nullptr){
+//        temp = temp->right_son;
+//    }
+//    return temp->value;
+//}
+
 template<class T, class S>
 void Dictionary<T, S>::print() {
     printAll(root);
+}
+
+template<class T, class S>
+S* Dictionary<T, S>::inorderNodesByValue() {
+    S* ans = new S[length];
+    counter_for_arrays = 0;
+    getAllNodes(root, ans);
+    return ans;
+}
+
+template<class T, class S>
+T* Dictionary<T, S>::inorderNodesByKey() {
+    T* ans = new T[length];
+    counter_for_arrays = 0;
+    getAllNodesByKey(root, ans);
+    return ans;
 }
 
 #endif //EX1_DICTIONARY_H

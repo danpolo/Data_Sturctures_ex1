@@ -26,6 +26,7 @@ private:
     Dictionary<int, Team*> m_dict_of_active_teams;     //teams with players
     Dictionary<int, Player*> m_dict_of_players_by_value;
     Dictionary<int, Player*> m_dict_of_players_by_key;
+    Player* m_top_scorer;
     int m_teams_total;
     int m_active_teams_total;
     int m_players_total;
@@ -67,6 +68,8 @@ public:
 	output_t<int> knockout_winner(int minTeamId, int maxTeamId);
 	
 	// } </DO-NOT-MODIFY>
+
+    void getTeams();
 };
 
 #endif // WORLDCUP23A1_H_

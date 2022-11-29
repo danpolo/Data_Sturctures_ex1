@@ -6,11 +6,50 @@
 
 Team::Team(int teamID, int points) : teamID(teamID), m_points(points), m_games_played(0),
                                 m_number_of_players(0), m_goalKeeper_exist(0), m_strength(points),
-                                m_dict_of_players_in_team(Dictionary<int, Player*>(true)){}
+                                m_dict_of_players_in_team(Dictionary<int, Player*>(false)),
+                                m_top_scorer_of_team(nullptr){}
 
 
 int Team::valueOfTeam() const {
     return m_strength + m_points;
+}
+
+int Team::getGamesPlayed() const {
+    return m_games_played;
+}
+
+bool Team::isValidTeam() const {
+    return ((numberOfPlayers() >= 11) && (isGoalKeeperExists()));
+}
+
+void Team::addGamesPlayed(int added) {
+    m_games_played += added;
+}
+
+int Team::getPoints() const {
+    return m_points;
+}
+
+int Team::getStrength() const {
+    return m_strength;
+}
+
+void Team::addPoints(int points) {
+    m_points += points;
+}
+
+void Team::move_all_players(Team *team2) {   //maybe need to catch an allocation error
+    Player** moving_players = team2->m_dict_of_players_in_team.inorderNodesByValue();
+    int number_of_players_to_move = team2->numberOfPlayers();
+    int i = 0;
+    while (i < number_of_players_to_move){
+        add_player_in_team((*moving_players)->getPlayerId(), *moving_players);
+        (*moving_players)->setTeamID(getID());
+        (*moving_players)->addGamesPlayed(team2->getGamesPlayed());
+        team2->remove_player_in_team((*moving_players)->getPlayerId(), *moving_players);
+        i++;
+        moving_players++;
+    }
 }
 
 bool Team::operator>(const Team &other) const {
@@ -40,10 +79,18 @@ bool Team::isGoalKeeperExists() const {
     return false;
 }
 
-StatusType Team::add_player(int playerID, Player *pl) {
+StatusType Team::add_player_in_team(int playerID, Player *pl){
     StatusType ans = m_dict_of_players_in_team.insert(playerID, pl);
     if (ans != StatusType::SUCCESS){
         return ans;
+    }
+    if (m_top_scorer_of_team == nullptr) {
+        m_top_scorer_of_team = pl;
+    }
+    else {
+        if (*m_top_scorer_of_team < *pl) {
+            m_top_scorer_of_team = pl;
+        }
     }
     m_number_of_players += 1;
     addStrength(pl->getGoals() - pl->getCards());
@@ -53,16 +100,20 @@ StatusType Team::add_player(int playerID, Player *pl) {
     return ans;
 }
 
-StatusType Team::remove_player(int playerID) {
-    Player* temp_player = m_dict_of_players_in_team.find(playerID);
-    if (temp_player->getPlayerId() != playerID){
+StatusType Team::remove_player_in_team(int playerID, Player* pl){
+    if (!m_dict_of_players_in_team.isExist(playerID, pl)){
         return StatusType::FAILURE;
     }
-    int player_strength = temp_player->getCards() - temp_player->getGoals();
-    bool is_player_gk = temp_player->isGk();
-    StatusType ans = m_dict_of_players_in_team.remove(playerID, temp_player);
+    int player_strength = pl->getCards() - pl->getGoals();
+    bool is_player_gk = pl->isGk();
+    bool is_top = (m_top_scorer_of_team == pl);
+    Player* father = m_dict_of_players_in_team.findFatherValue(pl);
+    StatusType ans = m_dict_of_players_in_team.remove(playerID, pl);
     if (ans != StatusType::SUCCESS){
         return ans;
+    }
+    if (is_top){
+        m_top_scorer_of_team = father;
     }
     m_number_of_players -= 1;
     addStrength(player_strength);
@@ -70,6 +121,14 @@ StatusType Team::remove_player(int playerID) {
         m_goalKeeper_exist -= 1;
     }
     return ans;
+}
+
+int Team::getTopScorerInTeam() const {
+    return m_top_scorer_of_team->getPlayerId();
+}
+
+int *Team::getAllPlayersInTeam() {
+    return m_dict_of_players_in_team.inorderNodesByKey();
 }
 
 bool operator!=(const Team& v1, const Team& v2){
