@@ -6,9 +6,9 @@
 #include "Player.h"
 #include <vector>
 
-const int MAX_LINE_LENGTH = 50;
+const int MAX_LINE_LENGTH = 75;
 
-void amendSentence(std::string str) {
+void printFunctionName(std::string str) {
     std::string out;
     out += str[0] - 32;
     for (int i = 1; i < str.length(); i++) {
@@ -27,19 +27,155 @@ void amendSentence(std::string str) {
 }
 
 bool findInEmptyDictionaryByKey() {
-    amendSentence(__FUNCTION__);
+    printFunctionName(__FUNCTION__);
     Dictionary<int, int*> dict = Dictionary<int, int*>(true);
     return dict.find(1) == nullptr;
 }
 
 bool findInEmptyDictionaryByValue() {
-    amendSentence(__FUNCTION__);
+    printFunctionName(__FUNCTION__);
     Dictionary<int, int*> dict = Dictionary<int, int*>(false);
     return dict.find(1) == nullptr;
 }
 
+bool findInOneElementDictionaryByKey() {
+    printFunctionName(__FUNCTION__);
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int element = 1;
+    dict.insert(element, &element);
+    return dict.find(1) == &element;
+}
 
-bool runTests(const std::vector<bool(*)()>& tests) {
+bool findInOneElementDictionaryByValue() {
+    printFunctionName(__FUNCTION__);
+    Dictionary<int, int*> dict = Dictionary<int, int*>(false);
+    int element = 1;
+    dict.insert(element, &element);
+    return dict.find(1) == &element;
+}
+
+bool findMissingElementInOneElementDictionaryByKey() {
+    printFunctionName(__FUNCTION__);
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int element = 1;
+    dict.insert(element, &element);
+    return dict.find(0) == &element;
+}
+
+bool findMissingElementInOneElementDictionaryByValue() {
+    printFunctionName(__FUNCTION__);
+    Dictionary<int, int*> dict = Dictionary<int, int*>(false);
+    int element = 1;
+    dict.insert(element, &element);
+    return dict.find(0) == &element;
+}
+
+void testSingleRrRotationByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int elements[3] = {1,2,3};
+    for (int i = 0; i < 3; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.print();
+}
+
+void testSingleLlRotationByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int elements[3] = {3,2,1};
+    for (int i = 0; i < 3; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.print();
+}
+
+void testSingleRlRotationByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int elements[3] = {1,3,2};
+    for (int i = 0; i < 3; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.print();
+}
+
+void testSingleLrRotationByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int elements[3] = {3,1,2};
+    for (int i = 0; i < 3; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.print();
+}
+
+void testSingleRrRotationByValue() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(false);
+    int elements[3] = {1,2,3};
+    for (int i = 1; i <= 3; i++) {
+        dict.insert(i, elements + i - 1);
+    }
+    dict.print();
+}
+
+void testSingleLlRotationByValue() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(false);
+    int elements[3] = {3,2,1};
+    for (int i = 1; i <= 3; i++) {
+        dict.insert(i, elements + i - 1);
+    }
+    dict.print();
+}
+
+void testSingleRlRotationByValue() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(false);
+    int elements[3] = {1,3,2};
+    for (int i = 1; i <= 3; i++) {
+        dict.insert(i, elements + i - 1);
+    }
+    dict.print();
+}
+
+void testSingleLrRotationByValue() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(false);
+    int elements[3] = {3,1,2};
+    for (int i = 1; i <= 3; i++) {
+        dict.insert(i, elements + i - 1);
+    }
+    dict.print();
+}
+
+void testMultipleRotationsByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    const int length = 15;
+    int elements[length];
+    for (int i = 0; i < length; i++) {
+        elements[i] = i + 1;
+    }
+    for (int i = 0; i < length; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.print();
+}
+
+bool runAutomaticTests(const std::vector<bool(*)()>& tests) {
+    std::cout << "Running Automatic Tests" << std::endl;
+    std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
     bool all_tests_passed = true;
     for (auto test : tests) {
         if (test()) {
@@ -57,14 +193,37 @@ int main() {
     std::cout << "Ignore this (Its for the colors)-> ";
     system(("chcp " + std::to_string(CP_UTF8)).c_str());
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
-    std::vector<bool(*)()> tests = {&findInEmptyDictionaryByKey, &findInEmptyDictionaryByValue};
-    if (runTests(tests)) {
+
+    std::vector<bool(*)()> automatic_tests = {&findInEmptyDictionaryByKey, &findInEmptyDictionaryByValue,
+                                              &findInOneElementDictionaryByKey,
+                                              &findInOneElementDictionaryByValue,
+                                              &findMissingElementInOneElementDictionaryByKey,
+                                              &findMissingElementInOneElementDictionaryByValue};
+
+    std::vector<void(*)()> manual_tests = {&testSingleRrRotationByKey,
+                                           &testSingleLlRotationByKey,
+                                           &testSingleRlRotationByKey,
+                                           &testSingleLrRotationByKey,
+                                           &testSingleLlRotationByValue,
+                                           &testSingleLrRotationByValue,
+                                           &testSingleRlRotationByValue,
+                                           &testSingleRrRotationByValue,
+                                           &testMultipleRotationsByKey};
+
+    if (runAutomaticTests(automatic_tests)) {
         std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
         std::cout << "\033[1;32mALL TESTS PASSED!!!\033[0m" << std::endl;
     }
     else {
         std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
-        std::cout << "\033[1;31mSome of the tests failed\033[0m" << std::endl;
+        std::cout << "\033[1;31mSome of the automatic_tests failed\033[0m" << std::endl;
+    }
+    std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
+    std::cout << "Running Manual Tests" << std::endl;
+    std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
+
+    for (auto test : manual_tests) {
+        test();
     }
 
     return 0;

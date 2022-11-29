@@ -116,11 +116,13 @@ private:
             }
             else {
                 father->setLeft(node->father);
+                father->left_son->setFather(father);
             }
         }
 
         if (root->key == node->key) {
             root = node->father;
+            root->setFather(nullptr);
         }
     }
 
@@ -134,16 +136,18 @@ private:
         node->setRight(left_son_of_right_son);
 
         if (father != nullptr) {
-            if (father->right_son->key == node->key) {
-                father->setRight(node->father);
+            if (father->left_son->key == node->key) {
+                father->setLeft(node->father);
             }
             else {
-                father->setLeft(node->father);
+                father->setRight(node->father);
+                father->right_son->setFather(father);
             }
         }
 
         if (root->key == node->key) {
             root = node->father;
+            root->setFather(nullptr);
         }
     }
 
