@@ -2,9 +2,12 @@
 // Created by itayi on 21/11/2022.
 //
 #include <windows.h>
+#include <vector>
+
 #include "Dictionary.h"
 #include "Player.h"
-#include <vector>
+#include "worldcup23a1.h"
+
 
 const int MAX_LINE_LENGTH = 75;
 
@@ -254,6 +257,182 @@ void testMultiplyRotationsAfterRemovalByKey() {
     dict.print();
 }
 
+bool constructorCrush() {
+    printFunctionName(__FUNCTION__);
+    try {
+        world_cup_t game = world_cup_t();
+    }
+    catch(...){
+        return false;
+    }
+    return true;
+}
+
+bool addTeamInvalidInputId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    return game.add_team(0, 1) == StatusType::INVALID_INPUT;
+}
+
+bool addTeamInvalidInputPoints() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    return game.add_team(1, -1) == StatusType::INVALID_INPUT;
+}
+
+bool addTeamSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    return game.add_team(1, 0) == StatusType::SUCCESS;
+}
+
+bool addTeamAlreadyExistingTeam() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    return game.add_team(1, 1) == StatusType::FAILURE;
+}
+
+bool removeTeamSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    return game.remove_team(1) == StatusType::SUCCESS;
+}
+
+bool removeTeamInvalidId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    return game.remove_team(0) == StatusType::INVALID_INPUT;
+}
+
+bool removeTeamTeamIdDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    return game.remove_team(2) == StatusType::FAILURE;
+}
+
+bool removeTeamNotEmpty() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.remove_team(1) == StatusType::FAILURE;
+}
+
+bool removeTeamAfterLastPlayerRemoval() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.remove_player(1);
+    return game.remove_team(1) == StatusType::SUCCESS;
+}
+
+bool addPlayerSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.add_player(1, 1, 1, 1, 1, false) == StatusType::SUCCESS;
+}
+
+bool addPlayerInvalidPlayerId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.add_player(0, 1, 1, 1, 1, false) == StatusType::INVALID_INPUT;
+}
+
+bool addPlayerInvalidTeamId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.add_player(1, 0, 1, 1, 1, false) == StatusType::INVALID_INPUT;
+}
+
+bool addPlayerInvalidGamesPlayed() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.add_player(1, 1, -1, 1, 1, false) == StatusType::INVALID_INPUT;
+}
+
+bool addPlayerInvalidGoals() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.add_player(1, 1, 1, -1, 1, false) == StatusType::INVALID_INPUT;
+}
+
+bool addPlayerInvalidCards() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.add_player(1, 1, 1, 1, -1, false) == StatusType::INVALID_INPUT;
+}
+
+bool addPlayerInvalidCardsWithoutGames() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.add_player(1, 1, 0, 0, 1, false) == StatusType::INVALID_INPUT;
+}
+
+bool addPlayerInvalidGoalsWithoutGames() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.add_player(1, 1, 0, 1, 0, false) == StatusType::INVALID_INPUT;
+}
+
+bool addPlayerAlreadyExistsInTeam() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 2, 3, 4, false);
+    return game.add_player(1, 1, 1, 1, 1, false) == StatusType::FAILURE;
+}
+
+bool addPlayerAlreadyExistsInAnotherTeam() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    game.add_player(1, 1, 2, 3, 4, false);
+    return game.add_player(1, 2, 1, 1, 1, false) == StatusType::FAILURE;
+}
+
+bool addPlayerTeamDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.add_player(1, 2, 1, 1, 1, false) == StatusType::FAILURE;
+}
+
+bool removePlayerSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.remove_player(1) == StatusType::SUCCESS;
+}
+
+bool removePlayerInvalidId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    return game.remove_player(0) == StatusType::INVALID_INPUT;
+}
+
+bool removePlayerDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.remove_player(2) == StatusType::FAILURE;
+}
+
 bool runAutomaticTests(const std::vector<bool(*)()>& tests) {
     std::cout << "Running Automatic Tests" << std::endl;
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
@@ -280,7 +459,23 @@ int main() {
                                               &findInOneElementDictionaryByValue,
                                               &findMissingElementInOneElementDictionaryByKey,
                                               &findMissingElementInOneElementDictionaryByValue,
-                                              &findElementAfterRemoval};
+                                              &findElementAfterRemoval, &constructorCrush,
+                                              &addTeamInvalidInputId, &addTeamInvalidInputPoints,
+                                              &addTeamSuccess, &addTeamAlreadyExistingTeam,
+                                              &removeTeamSuccess, &removeTeamInvalidId,
+                                              &removeTeamTeamIdDoesntExist, &removeTeamNotEmpty,
+                                              &removeTeamAfterLastPlayerRemoval,
+                                              &addPlayerSuccess, &addPlayerInvalidPlayerId,
+                                              &addPlayerInvalidTeamId,
+                                              &addPlayerInvalidGamesPlayed,
+                                              &addPlayerInvalidGoals, &addPlayerInvalidCards,
+                                              &addPlayerInvalidCardsWithoutGames,
+                                              &addPlayerInvalidGoalsWithoutGames,
+                                              &addPlayerAlreadyExistsInTeam,
+                                              &addPlayerAlreadyExistsInAnotherTeam,
+                                              &addPlayerTeamDoesntExist, &removePlayerSuccess,
+                                              &removePlayerInvalidId, &removePlayerInvalidId,
+                                              &removePlayerDoesntExist};
 
     std::vector<void(*)()> manual_tests = {&testSingleRrRotationByKey,
                                            &testSingleLlRotationByKey,
