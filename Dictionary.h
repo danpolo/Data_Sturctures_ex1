@@ -75,9 +75,8 @@ private:
         return right_son_height + 1;
     }
 
-    void stabilizeTree(Node<KEY, VALUE>* node) {
+    void stabilizeTree(Node<KEY, VALUE>* node, bool is_insert=true) {
         int old_height = node->height;
-        node->setHeight(getHeight(node));
         node->setBfValue(getBfValue(node));
         if (node->bf_value == 2) {
             if (node->left_son->bf_value == -1) {
@@ -96,12 +95,12 @@ private:
             }
         }
         node->setHeight(getHeight(node));
-        node->setBfValue(getBfValue(node));
-        if (old_height == node->height || node->father == nullptr) {
+
+        if (node->father == nullptr || (is_insert && old_height == node->height)) { // ||
             return;
         }
 
-        stabilizeTree(node->father);
+        stabilizeTree(node->father, is_insert);
     }
 
     int getBfValue(Node<KEY, VALUE>* node) {
@@ -115,6 +114,7 @@ private:
         node->setFather(node->left_son);
         node->left_son->setRight(node);
         node->setLeft(right_son_of_left_son);
+        node->father->setFather(father);
 
         if (father != nullptr) {
             if (father->right_son->key == node->key) {
@@ -122,7 +122,6 @@ private:
             }
             else {
                 father->setLeft(node->father);
-                father->left_son->setFather(father);
             }
         }
 
@@ -130,6 +129,11 @@ private:
             root = node->father;
             root->setFather(nullptr);
         }
+
+        node->setHeight(getHeight(node));
+        node->setBfValue(getBfValue(node));
+        node->father->setHeight(getHeight(node->father));
+        node->father->setBfValue(getBfValue(node->father));
     }
 
 
@@ -140,6 +144,7 @@ private:
         node->setFather(node->right_son);
         node->right_son->setLeft(node);
         node->setRight(left_son_of_right_son);
+        node->father->setFather(father);
 
         if (father != nullptr) {
             if (father->left_son->key == node->key) {
@@ -147,7 +152,6 @@ private:
             }
             else {
                 father->setRight(node->father);
-                father->right_son->setFather(father);
             }
         }
 
@@ -155,6 +159,11 @@ private:
             root = node->father;
             root->setFather(nullptr);
         }
+
+        node->setHeight(getHeight(node));
+        node->setBfValue(getBfValue(node));
+        node->father->setHeight(getHeight(node->father));
+        node->father->setBfValue(getBfValue(node->father));
     }
 
     void RLRotation(Node<KEY, VALUE>* node) {
@@ -241,6 +250,7 @@ private:
         }
         if ((ro->left_son == nullptr)&&(ro->right_son == nullptr)){
             if (ro->father == nullptr) {
+                root = nullptr;
                 delete ro;
                 length -= 1;
                 return;
@@ -251,7 +261,7 @@ private:
             else{
                 ro->father->setRight(nullptr);
             }
-            stabilizeTree(ro->father);
+            stabilizeTree(ro->father, false);
             delete ro;
             length -= 1;
             return;
@@ -270,7 +280,7 @@ private:
                     ro->right_son->setFather(ro->father);
                 }
             }
-            stabilizeTree(ro->father);
+            stabilizeTree(ro->father, false);
             delete ro;
             length -= 1;
             return;
@@ -289,7 +299,7 @@ private:
                     ro->left_son->setFather(ro->father);
                 }
             }
-            stabilizeTree(ro->father);
+            stabilizeTree(ro->father, false);
             delete ro;
             length -= 1;
             return;

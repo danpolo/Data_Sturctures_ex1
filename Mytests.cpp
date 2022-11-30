@@ -173,6 +173,87 @@ void testMultipleRotationsByKey() {
     dict.print();
 }
 
+bool findElementAfterRemoval() {
+    printFunctionName(__FUNCTION__);
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int element = 1;
+    dict.insert(element, &element);
+    dict.remove(element, &element);
+    return dict.find(element) == nullptr;
+}
+
+void testSingleRrRotationAfterRemovalByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int elements[4] = {2,1,3,4};
+    for (int i = 0; i < 4; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.remove(1, elements + 1);
+    dict.print();
+}
+
+void testSingleLlRotationAfterRemovalByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int elements[4] = {3,4,2,1};
+    for (int i = 0; i < 4; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.remove(4, elements + 1);
+    dict.print();
+}
+
+void testSingleLrRotationAfterRemovalByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int elements[4] = {3,4,1,2};
+    for (int i = 0; i < 4; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.remove(4, elements + 1);
+    dict.print();
+}
+
+void testSingleRlRotationAfterRemovalByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int elements[4] = {2,1,4,3};
+    for (int i = 0; i < 4; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.remove(1, elements + 1);
+    dict.print();
+}
+
+void testRotationAfterRemovalByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int elements[5] = {2,1,4,3,5};
+    for (int i = 0; i < 5; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.remove(2, elements);
+    dict.print();
+}
+
+void testMultiplyRotationsAfterRemovalByKey() {
+    printFunctionName(__FUNCTION__);
+    std::cout << std::endl;
+    Dictionary<int, int*> dict = Dictionary<int, int*>(true);
+    int elements[12] = {5,2,8,1,4,7,10,6,9,11,3,12};
+    for (int i = 0; i < 12; i++) {
+        dict.insert(elements[i], elements + i);
+    }
+    dict.remove(1, elements + 3);
+    dict.print();
+}
+
 bool runAutomaticTests(const std::vector<bool(*)()>& tests) {
     std::cout << "Running Automatic Tests" << std::endl;
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
@@ -198,7 +279,8 @@ int main() {
                                               &findInOneElementDictionaryByKey,
                                               &findInOneElementDictionaryByValue,
                                               &findMissingElementInOneElementDictionaryByKey,
-                                              &findMissingElementInOneElementDictionaryByValue};
+                                              &findMissingElementInOneElementDictionaryByValue,
+                                              &findElementAfterRemoval};
 
     std::vector<void(*)()> manual_tests = {&testSingleRrRotationByKey,
                                            &testSingleLlRotationByKey,
@@ -208,7 +290,13 @@ int main() {
                                            &testSingleLrRotationByValue,
                                            &testSingleRlRotationByValue,
                                            &testSingleRrRotationByValue,
-                                           &testMultipleRotationsByKey};
+                                           &testMultipleRotationsByKey,
+                                           &testSingleRrRotationAfterRemovalByKey,
+                                           &testSingleLlRotationAfterRemovalByKey,
+                                           &testSingleLrRotationAfterRemovalByKey,
+                                           &testSingleRlRotationAfterRemovalByKey,
+                                           &testRotationAfterRemovalByKey,
+                                           &testMultiplyRotationsAfterRemovalByKey};
 
     if (runAutomaticTests(automatic_tests)) {
         std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;

@@ -78,7 +78,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
         if (temp_team->getID() != teamId){
             return StatusType::FAILURE;
         }
-        temp_team->add_player(playerId, temp_player);
+        temp_team->add_player_in_team(playerId, temp_player);
         if (temp_team->numberOfPlayers() == 1){
             ans1 = m_dict_of_active_teams.insert(teamId, temp_team);
             if (ans1 != StatusType::SUCCESS){
@@ -125,7 +125,7 @@ StatusType world_cup_t::remove_player(int playerId)
     }
     Team* temp_team = m_dict_of_active_teams.find(player_team_id);
     //Maybe here there's a problem with complexity, but active_teams maybe solves it
-    ans = temp_team->remove_player(playerId);
+    ans = temp_team->remove_player_in_team(playerId, temp_player);
     if (ans != StatusType::SUCCESS){
         return ans;
     }
@@ -148,12 +148,12 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
         return StatusType::FAILURE;
     }
     Team* temp_team = m_dict_of_active_teams.find(temp_player->getTeamID());
-    temp_team->remove_player(playerId);
+    temp_team->remove_player_in_team(playerId, temp_player);
     m_dict_of_players_by_value.remove(playerId, temp_player);
     temp_player->addGoals(scoredGoals);
     temp_player->addGamesPlayed(gamesPlayed); // check if the value is zero, then need to set not add
     temp_player->addCards(cardsReceived);
-    temp_team->add_player(playerId, temp_player);
+    temp_team->add_player_in_team(playerId, temp_player);
     m_dict_of_players_by_value.insert(playerId, temp_player);
 //    temp_team->addStrength(temp_player->getGoals() - temp_player->getCards());
 //    if (*temp_player > *m_top_scorer){
