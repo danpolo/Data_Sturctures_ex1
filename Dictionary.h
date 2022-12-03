@@ -18,6 +18,8 @@ public:
     StatusType remove(KEY key, VALUE value);
     VALUE* inorderNodesByValue();
     KEY* inorderNodesByKey();
+    VALUE* inorderNodesByValueBetween(KEY keyMin, KEY keyMax);
+    int getCounterForArray();  //usefull for knockout only
     VALUE find(KEY key);
     VALUE findClosestLeft(VALUE value);
     VALUE findClosestRight(VALUE value);
@@ -286,12 +288,21 @@ private:
         counter_for_arrays += 1;
         getAllNodes(curr->right_son, ans);
     }
-//    void getAllNodesBetween(Node<KEY, VALUE>* curr, VALUE* ans, KEY compMin, KEY compMax){
-//        if (curr == nullptr){
-//            return;
-//        }
-//        if (curr->key)
-//    }
+    void getAllNodesBetween(Node<KEY, VALUE>* curr, VALUE* ans, KEY compMin, KEY compMax){
+        if (curr == nullptr){
+            return;
+        }
+        if (curr->key < compMin){
+            return;
+        }
+        getAllNodesBetween(curr->left_son, ans, compMin, compMax);
+        if (curr->key > compMax){
+            return;
+        }
+        ans[counter_for_arrays] = curr->value;
+        counter_for_arrays += 1;
+        getAllNodesBetween(curr->right_son, ans, compMin, compMax);
+    }
 
     void getAllNodesByKey(Node<KEY, VALUE>* curr, KEY* ans){
         if (curr == nullptr){
@@ -579,6 +590,19 @@ T* Dictionary<T, S>::inorderNodesByKey() {
     counter_for_arrays = 0;
     getAllNodesByKey(root, ans);
     return ans;
+}
+
+template<class T, class S>
+S* Dictionary<T, S>::inorderNodesByValueBetween(T keyMin, T keyMax) {
+    S* ans = new S[length];
+    //maybe the space complexity here is a problem
+    counter_for_arrays = 0;
+    getAllNodesBetween(root, ans, keyMin, keyMax);
+    return ans;
+}
+template<class T, class S>
+int Dictionary<T, S>::getCounterForArray() {
+    return counter_for_arrays;
 }
 
 #endif //EX1_DICTIONARY_H

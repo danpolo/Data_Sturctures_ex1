@@ -255,6 +255,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
             }
             m_dict_of_teams.remove(teamId2, team2);
             m_teams_total -= 1;
+            team1->addPoints(team2->getPoints());
         }
         else{
             if (teamId2 == newTeamId){
@@ -265,6 +266,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
                 }
                 m_dict_of_teams.remove(teamId1, team1);
                 m_teams_total -= 1;
+                team2->addPoints(team1->getPoints());
             }
             else{
                 return StatusType::FAILURE;
@@ -396,10 +398,157 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 {
-	// TODO: Your code goes here
-	return 2;
+    if ((minTeamId < 0) || (maxTeamId < 0) || (maxTeamId < minTeamId)){
+        return StatusType::INVALID_INPUT;
+    }
+    Team** ans = m_dict_of_active_teams.inorderNodesByValueBetween(minTeamId, maxTeamId);
+    Team** begin = ans;
+    int counter = m_dict_of_active_teams.getCounterForArray();
+    if (counter == 0){
+        delete[] ans;
+        return StatusType::FAILURE;
+    }
+    int valid_counter = counter;
+    for (int i = 0; i < counter; i++) {
+        if (!((*begin)->isValidTeam())){
+            (*begin) = nullptr;
+            valid_counter--;
+        }
+        begin++;
+    }
+    if (valid_counter == 0){
+        delete[] ans;
+        return StatusType::FAILURE;
+    }
+    begin = ans;
+    // maybe to "try" and "catch" here
+    Team** validTeams = new Team*[valid_counter];
+    Team** decreasing_valid_teams = nullptr;
+    int j = 0, temp_valid_counter = 0;
+    for (int i = 0; i < counter; i++){
+        if ((*begin) != nullptr){
+            validTeams[j] = *begin;
+            j++;
+        }
+        begin++;
+    }
+    while (valid_counter != 1){
+        temp_valid_counter = valid_counter;
+        for (int i = 0; i < valid_counter - 1; i += 2) {
+            if (((*(validTeams[i])) > ((*(validTeams[i + 1])))) ||
+                ((((*(validTeams[i])) == ((*(validTeams[i + 1]))))) &&
+                 (validTeams[i]->getID() > (validTeams[i + 1]->getID())))) {
+                validTeams[i]->addPoints(validTeams[i + 1]->getPoints());
+                validTeams[i]->addCompensationPoints(validTeams[i + 1]->getPoints() * -1);
+                validTeams[i]->addStrength(validTeams[i + 1]->getStrength());
+                validTeams[i]->addCompensationStrength(validTeams[i + 1]->getStrength() * -1);
+                validTeams[i + 1]->addPoints(validTeams[i + 1]->getCompensationPoints());
+                validTeams[i + 1]->addStrength(validTeams[i + 1]->getCompensationStrength());
+                validTeams[i + 1] = nullptr;
+            } else {
+                validTeams[i + 1]->addPoints(validTeams[i]->getPoints());
+                validTeams[i + 1]->addCompensationPoints(validTeams[i]->getPoints() * -1);
+                validTeams[i + 1]->addStrength(validTeams[i]->getStrength());
+                validTeams[i + 1]->addCompensationStrength(validTeams[i]->getStrength() * -1);
+                validTeams[i]->addPoints(validTeams[i]->getCompensationPoints());
+                validTeams[i]->addStrength(validTeams[i]->getCompensationStrength());
+                validTeams[i] = nullptr;
+            }
+            temp_valid_counter--;
+        }
+        decreasing_valid_teams = new Team*[temp_valid_counter];
+        begin = validTeams;
+        j = 0;
+        for (int i = 0; i < valid_counter; i++){
+            if ((*begin) != nullptr){
+                decreasing_valid_teams[j] = *begin;
+                j++;
+            }
+            begin++;
+        }
+        delete[] validTeams;
+//        for (int i = 0; i < valid_counter; i++){
+//            if (validTeams[i] == nullptr)
+//            delete validTeams[i];
+//        }
+        //releasing certain values in validTeams will release also in decreasing_valid_teams
+        valid_counter = temp_valid_counter;
+        validTeams = decreasing_valid_teams;
+    }
+    validTeams[0]->addPoints(validTeams[0]->getCompensationPoints());
+    validTeams[0]->addStrength(validTeams[0]->getCompensationStrength());
+	return validTeams[0]->getID();
 }
 
-void world_cup_t::getPlayers(){
-    m_dict_of_players_by_value.print();
+void world_cup_t::getTeams(){
+    Team** ans = m_dict_of_active_teams.inorderNodesByValueBetween(4, 19);
+    Team** begin = ans;
+    int counter = m_dict_of_active_teams.getCounterForArray();
+    int valid_counter = counter;
+    for (int i = 0; i < counter; i++) {
+        if (!((*begin)->isValidTeam())){
+            (*begin) = nullptr;
+            valid_counter--;
+        }
+        begin++;
+    }
+    begin = ans;
+    Team** validTeams = new Team*[valid_counter];
+    Team** decreasing_valid_teams = nullptr;
+    int j = 0, temp_valid_counter = 0;
+    for (int i = 0; i < counter; i++){
+        if ((*begin) != nullptr){
+            validTeams[j] = *begin;
+            j++;
+        }
+        begin++;
+    }
+    while (valid_counter != 1){
+        temp_valid_counter = valid_counter;
+        for (int i = 0; i < valid_counter - 1; i += 2) {
+            if (((*(validTeams[i])) > ((*(validTeams[i + 1])))) ||
+                ((((*(validTeams[i])) == ((*(validTeams[i + 1]))))) &&
+                 (validTeams[i]->getID() > (validTeams[i + 1]->getID())))) {
+                validTeams[i]->addPoints(validTeams[i + 1]->getPoints());
+                validTeams[i]->addCompensationPoints(validTeams[i + 1]->getPoints() * -1);
+                validTeams[i]->addStrength(validTeams[i + 1]->getStrength());
+                validTeams[i]->addCompensationStrength(validTeams[i + 1]->getStrength() * -1);
+                validTeams[i + 1]->addPoints(validTeams[i + 1]->getCompensationPoints());
+                validTeams[i + 1]->addStrength(validTeams[i + 1]->getCompensationStrength());
+                validTeams[i + 1] = nullptr;
+            } else {
+                validTeams[i + 1]->addPoints(validTeams[i]->getPoints());
+                validTeams[i + 1]->addCompensationPoints(validTeams[i]->getPoints() * -1);
+                validTeams[i + 1]->addStrength(validTeams[i]->getStrength());
+                validTeams[i + 1]->addCompensationStrength(validTeams[i]->getStrength() * -1);
+                validTeams[i]->addPoints(validTeams[i]->getCompensationPoints());
+                validTeams[i]->addStrength(validTeams[i]->getCompensationStrength());
+                validTeams[i] = nullptr;
+            }
+            temp_valid_counter--;
+        }
+        decreasing_valid_teams = new Team*[temp_valid_counter];
+        begin = validTeams;
+        j = 0;
+        for (int i = 0; i < valid_counter; i++){
+            if ((*begin) != nullptr){
+                decreasing_valid_teams[j] = *begin;
+                j++;
+            }
+            begin++;
+        }
+        delete[] validTeams;
+//        for (int i = 0; i < valid_counter; i++){
+//            if (validTeams[i] == nullptr)
+//            delete validTeams[i];
+//        }
+        //releasing certain values in validTeams will release also in decreasing_valid_teams
+        valid_counter = temp_valid_counter;
+        validTeams = decreasing_valid_teams;
+    }
+    validTeams[0]->addPoints(validTeams[0]->getCompensationPoints());
+    validTeams[0]->addStrength(validTeams[0]->getCompensationStrength());
+    std::cout << "The winner is" << std::endl;
+    std::cout << validTeams[0]->getID() << std::endl;
+
 }

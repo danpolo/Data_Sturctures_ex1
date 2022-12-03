@@ -69,7 +69,7 @@ public:
 	
 	// } </DO-NOT-MODIFY>
 
-    void getPlayers();
+    void getTeams();
 };
 
 #endif // WORLDCUP23A1_H_

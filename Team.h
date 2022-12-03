@@ -35,6 +35,10 @@ public:
     Player* findPlayerByKey(int key);
     bool operator/(const Team& other) const;
     int* getAllPlayersInTeam();
+    int getCompensationPoints() const;
+    void addCompensationPoints(int points);
+    int getCompensationStrength() const;
+    void addCompensationStrength(int strength);
     //Output_t<int> getTopScorer();
 
     ~Team() = default;
@@ -46,6 +50,8 @@ private:
     int m_games_played;
     int m_number_of_players;
     int m_goalKeeper_exist;
+    int m_compensation_points;
+    int m_compensation_strength;
     Dictionary<int, Player*> m_dict_of_players_in_team;
     Dictionary<int, Player*> m_dict_of_players_in_team_by_key;
     Player* m_top_scorer_of_team;
