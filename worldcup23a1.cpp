@@ -43,12 +43,13 @@ StatusType world_cup_t::remove_team(int teamId)
         return StatusType::INVALID_INPUT;
     }
     Team* curr = m_dict_of_teams.find(teamId);
-    if ((curr->getID() != teamId) || (curr->numberOfPlayers() > 0)){
+    if (curr == nullptr || (curr->getID() != teamId) || (curr->numberOfPlayers() > 0)){
         return StatusType::FAILURE;
     }
     StatusType ans = m_dict_of_teams.remove(teamId, curr);
     if (ans == StatusType::SUCCESS){
         m_teams_total -= 1;
+        delete curr;
     }
 	return ans;
 }
@@ -69,7 +70,12 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
             delete temp_player;
             return ans1;
         }
+
         ans1 = m_dict_of_players_by_value.insert(playerId, temp_player);
+        if (ans1 != StatusType::SUCCESS){
+            delete temp_player;
+            return ans1;
+        }
         Player* temp_player_left = m_dict_of_players_by_value.findClosestLeft(temp_player);
         Player* temp_player_right = m_dict_of_players_by_value.findClosestRight(temp_player);
         temp_player->setClosestLeft(temp_player_left);
@@ -80,15 +86,15 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
         if (temp_player_right != nullptr) {
             temp_player_right->setClosestLeft(temp_player);
         }
-        if (ans1 != StatusType::SUCCESS){
-            delete temp_player;
-            return ans1;
-        }
+
         Team* temp_team = m_dict_of_teams.find(teamId);
-        if (temp_team->getID() != teamId){
+        if (temp_team == nullptr || temp_team->getID() != teamId){
             return StatusType::FAILURE;
         }
-        temp_team->add_player_in_team(playerId, temp_player);
+        ans1 = temp_team->add_player_in_team(playerId, temp_player);
+        if (ans1 != StatusType::SUCCESS){
+            return ans1;
+        }
         if (temp_team->numberOfPlayers() == 1){
             ans1 = m_dict_of_active_teams.insert(teamId, temp_team);
             if (ans1 != StatusType::SUCCESS){
@@ -154,6 +160,7 @@ StatusType world_cup_t::remove_player(int playerId)
         m_active_teams_total -= 1;
     }
     m_players_total -= 1;
+    delete temp_player;
     return ans;
 }
 
@@ -164,7 +171,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
         return StatusType::INVALID_INPUT;
     }
 	Player* temp_player = m_dict_of_players_by_key.find(playerId);
-    if (temp_player->getPlayerId() != playerId){
+    if (temp_player == nullptr || temp_player->getPlayerId() != playerId){
         return StatusType::FAILURE;
     }
     Team* temp_team = m_dict_of_active_teams.find(temp_player->getTeamID());
@@ -189,7 +196,8 @@ StatusType world_cup_t::play_match(int teamId1, int teamId2)
     }
     Team* team1 = m_dict_of_teams.find(teamId1);
     Team* team2 = m_dict_of_teams.find(teamId2);
-    if ((team1->getID() != teamId1) || (team2->getID() != teamId2) || (!(team2->isValidTeam())) || (!(team1->isValidTeam()))){
+    if (team1 == nullptr || team2 == nullptr || (team1->getID() != teamId1) ||
+    (team2->getID() !=teamId2) || (!(team2->isValidTeam())) || (!(team1->isValidTeam()))){
         return StatusType::FAILURE;
     }
     if (*team1 < *team2){
@@ -215,7 +223,7 @@ output_t<int> world_cup_t::get_num_played_games(int playerId)
         return StatusType::INVALID_INPUT;
     }
     Player* pl = m_dict_of_players_by_key.find(playerId);
-    if (pl->getPlayerId() != playerId){
+    if (pl == nullptr || pl->getPlayerId() != playerId){
         return StatusType::FAILURE;
     }
     int number_of_games_in_team = m_dict_of_active_teams.find(pl->getTeamID())->getGamesPlayed();
@@ -229,7 +237,7 @@ output_t<int> world_cup_t::get_team_points(int teamId)
         return StatusType::INVALID_INPUT;
     }
     Team* team_curr = m_dict_of_teams.find(teamId);
-    if (team_curr->getID() != teamId){
+    if (team_curr == nullptr || team_curr->getID() != teamId){
         return StatusType::FAILURE;
     }
 	return team_curr->getPoints();
@@ -242,7 +250,8 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
     }
     Team* team1 = m_dict_of_teams.find(teamId1);
     Team* team2 = m_dict_of_teams.find(teamId2);
-    if ((team1->getID() != teamId1) || (team2->getID() != teamId2)){
+    if (team1 == nullptr || team2 == nullptr || (team1->getID() != teamId1) ||
+       (team2->getID() != teamId2)){
         return StatusType::FAILURE;
     }
     Team* temp_team = m_dict_of_teams.find(newTeamId);
@@ -256,6 +265,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
             m_dict_of_teams.remove(teamId2, team2);
             m_teams_total -= 1;
             team1->addPoints(team2->getPoints());
+            delete team2;
         }
         else{
             if (teamId2 == newTeamId){
@@ -267,6 +277,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
                 m_dict_of_teams.remove(teamId1, team1);
                 m_teams_total -= 1;
                 team2->addPoints(team1->getPoints());
+                delete team1;
             }
             else{
                 return StatusType::FAILURE;
@@ -304,6 +315,8 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
         m_dict_of_teams.remove(teamId1, team1);
         m_dict_of_teams.remove(teamId2, team2);
         m_teams_total -= 2;
+        delete team1;
+        delete team2;
     }
     catch (std::bad_alloc&){
         return StatusType::ALLOCATION_ERROR;
@@ -318,7 +331,7 @@ output_t<int> world_cup_t::get_top_scorer(int teamId)
     }
     if (teamId > 0){
         Team* temp_team = m_dict_of_active_teams.find(teamId);
-        if (temp_team->getID() != teamId){
+        if (temp_team == nullptr || temp_team->getID() != teamId){
             return StatusType::FAILURE;
         }
         return temp_team->getTopScorerInTeam();
@@ -351,7 +364,7 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
     }
     if (teamId > 0){
         Team* temp_team = m_dict_of_active_teams.find(teamId);
-        if (temp_team->getID() != teamId){
+        if (temp_team == nullptr || temp_team->getID() != teamId){
             return StatusType::FAILURE;
         }
         int* answer = temp_team->getAllPlayersInTeam();

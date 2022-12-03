@@ -3,6 +3,8 @@
 //
 #include <windows.h>
 #include <vector>
+#include <cstdlib>
+#include <random>
 
 #include "Dictionary.h"
 #include "Player.h"
@@ -433,15 +435,641 @@ bool removePlayerDoesntExist() {
     return game.remove_player(2) == StatusType::FAILURE;
 }
 
+bool updatePlayerStatsInvalidId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.update_player_stats(0, 1, 1, 1) == StatusType::INVALID_INPUT;
+}
+
+bool updatePlayerStatsInvalidGamesPlayed() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.update_player_stats(1, -1, 1, 1) == StatusType::INVALID_INPUT;
+}
+
+bool updatePlayerStatsInvalidGoals() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.update_player_stats(1, 1, -1, 1) == StatusType::INVALID_INPUT;
+}
+
+bool updatePlayerStatsInvalidCards() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.update_player_stats(1, 1, 1, -1) == StatusType::INVALID_INPUT;
+}
+
+bool updatePlayerStatsPlayerDoesntExists() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.update_player_stats(2, 1, 1, 1) == StatusType::FAILURE;
+}
+
+bool updatePlayerStatsSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.update_player_stats(1, 1, 1, 1) == StatusType::SUCCESS;
+}
+
+bool playMatchInvalidFirstTeamId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    return game.play_match(0, 1) == StatusType::INVALID_INPUT;
+}
+
+bool playMatchInvalidSecondTeamId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    return game.play_match(1, 0) == StatusType::INVALID_INPUT;
+}
+
+bool playMatchSameTeamsId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    return game.play_match(1, 1) == StatusType::INVALID_INPUT;
+}
+
+bool playMatchFirstTeamDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    return game.play_match(3, 1) == StatusType::FAILURE;
+}
+
+bool playMatchSecondTeamDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    return game.play_match(1, 3) == StatusType::FAILURE;
+}
+
+bool playMatchFirstTeamIsNotValid() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        if (i == 1) {
+            game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+        }
+    }
+    return game.play_match(1, 2) == StatusType::FAILURE;
+}
+
+bool playMatchSecondTeamIsNotValid() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        if (i == 0) {
+            game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+        }
+    }
+    return game.play_match(1, 2) == StatusType::FAILURE;
+}
+
+bool playMatchSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    return game.play_match(1, 2) == StatusType::SUCCESS;
+}
+
+bool getNumPlayedGamesInvalidId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.get_num_played_games(0).status() == StatusType::INVALID_INPUT;
+}
+
+bool getNumPlayedGamesPlayerDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.get_num_played_games(1).status() == StatusType::FAILURE;
+}
+
+bool getNumPlayedGamesSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.get_num_played_games(1).status() == StatusType::SUCCESS;
+}
+
+bool getNumPlayedGamesTestOutValue() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.get_num_played_games(1).ans() == 1;
+}
+
+bool getNumPlayedGamesAfterUpdate() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.update_player_stats(1, 1, 1, 1);
+    return game.get_num_played_games(1).ans() == 2;
+}
+
+bool getNumPlayedGamesAfterMatch() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    game.play_match(1, 2);
+    return game.get_num_played_games(1).ans() == 1;
+}
+
+bool getTeamPointsInvalidId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.get_team_points(0).status() == StatusType::INVALID_INPUT;
+}
+
+bool getTeamPointsTeamDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    return game.get_team_points(1).status() == StatusType::FAILURE;
+}
+
+bool getTeamPointsSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.get_team_points(1).status() == StatusType::SUCCESS;
+}
+
+bool getTeamPointsTestOutValue() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,1);
+    return game.get_team_points(1).ans() == 1;
+}
+
+bool getTeamPointsAfterMatchWin() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,1);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    game.play_match(1, 2);
+    return game.get_team_points(1).ans() == 4;
+}
+
+bool getTeamPointsAfterMatchLoose() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,1);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    game.play_match(1, 2);
+    return game.get_team_points(2).ans() == 0;
+}
+
+bool getTeamPointsAfterMatchTie() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 0, 0, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    game.play_match(1, 2);
+    return game.get_team_points(1).ans() == 1;
+}
+
+bool getTeamPointsAfterMatchWinByGoals() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 1, i, 0, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    game.play_match(1, 2);
+    return game.get_team_points(2).ans() == 3;
+}
+
+bool getTeamPointsAfterMatchWinByCards() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 1, 0, i, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    game.play_match(1, 2);
+    return game.get_team_points(1).ans() == 3;
+}
+
+bool uniteTeamsInvalidTeam1Id() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.unite_teams(0, 1, 1) == StatusType::INVALID_INPUT;
+}
+
+bool uniteTeamsInvalidTeam2Id() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.unite_teams(1, 0, 1) == StatusType::INVALID_INPUT;
+}
+
+bool uniteTeamsInvalidNewTeamId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    return game.unite_teams(1, 2, 0) == StatusType::INVALID_INPUT;
+}
+
+bool uniteTeamsSameTeamsId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.unite_teams(1, 1, 2) == StatusType::INVALID_INPUT;
+}
+
+bool uniteTeamsTeam1DoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.unite_teams(2, 1, 3) == StatusType::FAILURE;
+}
+
+bool uniteTeamsTeam2DoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.unite_teams(1, 2, 3) == StatusType::FAILURE;
+}
+
+bool uniteTeamsNewTeamIdAlreadyExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    game.add_team(3,0);
+    return game.unite_teams(1, 2, 3) == StatusType::FAILURE;
+}
+
+bool uniteTeamsSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    return game.unite_teams(1, 2, 1) == StatusType::SUCCESS;
+}
+
+bool uniteTeamsNewTeamPoints() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,1);
+    game.add_team(2,2);
+    game.unite_teams(1, 2, 3);
+    return game.get_team_points(3).ans() == 3;
+}
+
+bool getTopScorerInvalidId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    return game.get_top_scorer(0).status() == StatusType::INVALID_INPUT;
+}
+
+bool getTopScorerNoPlayers() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.remove_player(1);
+    return game.get_top_scorer(-1).status() == StatusType::FAILURE;
+}
+
+bool getTopScorerTeamDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.remove_team(1);
+    return game.get_top_scorer(1).status() == StatusType::FAILURE;
+}
+
+bool getTopScorerNoPlayersInTeam() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.remove_player(1);
+    return game.get_top_scorer(1).status() == StatusType::FAILURE;
+}
+
+bool getTopScorerTestValueInTeam() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 1, 1, 3, 1, false);
+    game.add_player(3, 2, 1, 10, 1, false);
+    return game.get_top_scorer(1).ans() == 2;
+}
+
+bool getTopScorerSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    return game.get_top_scorer(1).status() == StatusType::SUCCESS;
+}
+
+bool getTopScorerTestValueInAllTeams() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 1, 1, 3, 1, false);
+    game.add_player(3, 2, 1, 10, 1, false);
+    return game.get_top_scorer(-1).ans() == 3;
+}
+
+bool getAllPlayersCountInvalidId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    return game.get_all_players_count(0).status() == StatusType::INVALID_INPUT;
+}
+
+bool getAllPlayersCountTeamDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.get_all_players_count(2).status() == StatusType::FAILURE;
+}
+
+bool getAllPlayersCountSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    return game.get_all_players_count(1).status() == StatusType::SUCCESS;
+}
+
+bool getAllPlayersCountInAllTeams() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    game.add_player(1,1,1,1,1, false);
+    game.add_player(2,2,1,1,1, false);
+    game.add_player(3,1,1,1,1, false);
+    game.remove_player(3);
+    return game.get_all_players_count(-1).ans() == 2;
+}
+
+bool getAllPlayersCountInTeam() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    game.add_player(1,1,1,1,1, false);
+    game.add_player(2,2,1,1,1, false);
+    game.add_player(3,1,1,1,1, false);
+    game.remove_player(3);
+    return game.get_all_players_count(1).ans() == 1;
+}
+
+bool getAllPlayersCountInTeamAfterUnite() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1,0);
+    game.add_team(2,0);
+    game.add_player(1,1,1,1,1, false);
+    game.add_player(2,2,1,1,1, false);game.unite_teams(1, 2, 3);
+    return game.get_all_players_count(3).ans() == 2;
+}
+
+bool getAllPlayersInvalidId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    int players_count = game.get_all_players_count(-1).ans();
+    int players[players_count];
+    return game.get_all_players(0, players) == StatusType::INVALID_INPUT;
+}
+
+bool getAllPlayersInvalidOutput() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    return game.get_all_players(-1, nullptr) == StatusType::INVALID_INPUT;
+}
+
+bool getAllPlayersTeamDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    game.remove_team(2);
+    int players[1];
+    return game.get_all_players(2, players) == StatusType::FAILURE;
+}
+
+bool getAllPlayersEmptyTeam() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.remove_player(1);
+    int players_count = game.get_all_players_count(1).ans();
+    int players[players_count];
+    return game.get_all_players(1, players) == StatusType::FAILURE;
+}
+
+bool getAllPlayersNoPlayers() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.remove_player(1);
+    int players_count = game.get_all_players_count(-1).ans();
+    int players[players_count];
+    return game.get_all_players(-1, players) == StatusType::FAILURE;
+}
+
+bool getAllPlayersSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    int players_count = game.get_all_players_count(-1).ans();
+    int players[players_count];
+    return game.get_all_players(-1, players) == StatusType::SUCCESS;
+}
+
+bool getAllPlayersTestValueInTeam() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 2, 1, 1, 1, false);
+    game.add_player(3, 1, 1, 1, 1, false);
+    game.remove_player(1);
+    int players_count = game.get_all_players_count(1).ans();
+    int players[players_count];
+    game.get_all_players(1, players);
+    return players_count == 1 and players[0] == 3;
+}
+
+bool getAllPlayersTestValueInAllTeams() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 2, 1, 1, 1, false);
+    game.add_player(3, 1, 1, 1, 1, false);
+    game.remove_player(1);
+    int players_count = game.get_all_players_count(-1).ans();
+    int players[players_count];
+    game.get_all_players(-1, players);
+    return players_count == 2 and players[0] == 2 and players[1] == 3;
+}
+
+bool getAllPlayersTestPlayersOrder() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    for (int i = 1; i <= 10; i++) {
+        game.add_team(i, 0);
+    }
+
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_int_distribution<std::mt19937::result_type> dist1(1,1000000);
+    std::uniform_int_distribution<std::mt19937::result_type> dist2(1,10);
+
+    for (int i = 0; i < 1000; i++) {
+        game.add_player(dist1(rng), dist2(rng), 1, 1, 1, false);
+    }
+
+    int players_count = game.get_all_players_count(-1).ans();
+    int players[players_count];
+    game.get_all_players(-1, players);
+
+    for (int i = 0; i < 999; i++) {
+        if (players[i+1] <= players[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 bool runAutomaticTests(const std::vector<bool(*)()>& tests) {
     std::cout << "Running Automatic Tests" << std::endl;
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
     bool all_tests_passed = true;
     for (auto test : tests) {
-        if (test()) {
-            std::cout << "\033[1;32m - TEST PASSED\033[0m" << std::endl;
+        try {
+            if (test()) {
+                std::cout << "\033[1;32m - TEST PASSED\033[0m" << std::endl;
+            }
+            else {
+                all_tests_passed = false;
+                std::cout << "\033[1;31m - TEST FAILED\033[0m" << std::endl;
+            }
         }
-        else {
+        catch (...) {
             all_tests_passed = false;
             std::cout << "\033[1;31m - TEST FAILED\033[0m" << std::endl;
         }
@@ -449,7 +1077,7 @@ bool runAutomaticTests(const std::vector<bool(*)()>& tests) {
     return all_tests_passed;
 }
 
-int main2() {
+int main() {
     std::cout << "Ignore this (Its for the colors)-> ";
     system(("chcp " + std::to_string(CP_UTF8)).c_str());
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
@@ -475,7 +1103,61 @@ int main2() {
                                               &addPlayerAlreadyExistsInAnotherTeam,
                                               &addPlayerTeamDoesntExist, &removePlayerSuccess,
                                               &removePlayerInvalidId, &removePlayerInvalidId,
-                                              &removePlayerDoesntExist};
+                                              &removePlayerDoesntExist,
+                                              &updatePlayerStatsInvalidId,
+                                              &updatePlayerStatsInvalidGamesPlayed,
+                                              &updatePlayerStatsInvalidGoals,
+                                              &updatePlayerStatsInvalidCards,
+                                              &updatePlayerStatsPlayerDoesntExists,
+                                              &updatePlayerStatsSuccess,
+                                              &playMatchInvalidFirstTeamId,
+                                              &playMatchInvalidSecondTeamId,
+                                              &playMatchSameTeamsId,
+                                              &playMatchFirstTeamDoesntExist,
+                                              &playMatchSecondTeamDoesntExist,
+                                              &playMatchFirstTeamIsNotValid,
+                                              &playMatchSecondTeamIsNotValid, &playMatchSuccess,
+                                              &getNumPlayedGamesInvalidId,
+                                              &getNumPlayedGamesPlayerDoesntExist,
+                                              &getNumPlayedGamesSuccess,
+                                              &getNumPlayedGamesTestOutValue,
+                                              &getNumPlayedGamesAfterUpdate,
+                                              &getNumPlayedGamesAfterMatch,
+                                              &getTeamPointsInvalidId,
+                                              &getTeamPointsTeamDoesntExist,
+                                              &getTeamPointsSuccess, &getTeamPointsTestOutValue,
+                                              &getTeamPointsAfterMatchWin,
+                                              &getTeamPointsAfterMatchLoose,
+                                              &getTeamPointsAfterMatchTie,
+                                              &getTeamPointsAfterMatchWinByGoals,
+                                              &getTeamPointsAfterMatchWinByCards,
+                                              &uniteTeamsInvalidTeam1Id,
+                                              &uniteTeamsInvalidTeam2Id,
+                                              &uniteTeamsInvalidNewTeamId,
+                                              &uniteTeamsSameTeamsId,
+                                              &uniteTeamsTeam1DoesntExist,
+                                              &uniteTeamsTeam2DoesntExist,
+                                              &uniteTeamsNewTeamIdAlreadyExist,
+                                              &uniteTeamsSuccess, &uniteTeamsNewTeamPoints,
+                                              &getTopScorerInvalidId, &getTopScorerNoPlayers,
+                                              &getTopScorerTeamDoesntExist,
+                                              &getTopScorerNoPlayersInTeam, &getTopScorerSuccess,
+                                              &getTopScorerTestValueInTeam,
+                                              &getTopScorerTestValueInAllTeams,
+                                              &getAllPlayersCountInvalidId,
+                                              &getAllPlayersCountTeamDoesntExist,
+                                              &getAllPlayersCountSuccess,
+                                              &getAllPlayersCountInAllTeams,
+                                              &getAllPlayersCountInTeam,
+                                              &getAllPlayersCountInTeamAfterUnite,
+                                              getAllPlayersInvalidId,
+                                              &getAllPlayersInvalidOutput,
+                                              &getAllPlayersTeamDoesntExist,
+                                              &getAllPlayersEmptyTeam, &getAllPlayersNoPlayers,
+                                              &getAllPlayersSuccess,
+                                              &getAllPlayersTestValueInTeam,
+                                              &getAllPlayersTestValueInAllTeams,
+                                              &getAllPlayersTestPlayersOrder};
 
     std::vector<void(*)()> manual_tests = {&testSingleRrRotationByKey,
                                            &testSingleLlRotationByKey,
@@ -499,7 +1181,7 @@ int main2() {
     }
     else {
         std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
-        std::cout << "\033[1;31mSome of the automatic_tests failed\033[0m" << std::endl;
+        std::cout << "\033[1;31mSome of the automatic tests failed\033[0m" << std::endl;
     }
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
     std::cout << "Running Manual Tests" << std::endl;
@@ -599,6 +1281,6 @@ void generalTest3(){
     std::cout << "Test 5, end" << std::endl;
 }
 
-int main(){
+int main2(){
     generalTest3();
 }

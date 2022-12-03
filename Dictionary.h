@@ -94,6 +94,9 @@ private:
     }
 
     void stabilizeTree(Node<KEY, VALUE>* node, bool is_insert=true) {
+        if (node == nullptr) {
+            return;
+        }
         int old_height = node->height;
         node->setBfValue(getBfValue(node));
         if (node->bf_value == 2) {
@@ -366,11 +369,15 @@ private:
                 }
             }
             stabilizeTree(ro->father, false);
-            Node<KEY, VALUE>* temp_lefty = findNodeByValue(root, ro->getClosestSmall(), nullptr, nullptr);
-            Node<KEY, VALUE>* temp_righty = findNodeByValue(root, ro->getClosestBig(), nullptr, nullptr);
             //log(n) + log(n), maybe a problem with complexity
-            temp_lefty->setClosestBig(ro->getClosestBig());
-            temp_righty->setClosestSmall(ro->getClosestSmall());
+            if (ro->getClosestSmall() != nullptr) {
+                Node<KEY, VALUE>* temp_lefty = findNodeByValue(root, ro->getClosestSmall(), nullptr, nullptr);
+                temp_lefty->setClosestBig(ro->getClosestBig());
+            }
+            if (ro->getClosestBig() != nullptr) {
+                Node<KEY, VALUE>* temp_righty = findNodeByValue(root, ro->getClosestBig(), nullptr, nullptr);
+                temp_righty->setClosestSmall(ro->getClosestSmall());
+            }
             delete ro;
             length -= 1;
             return;
@@ -537,6 +544,9 @@ template<class KEY, class VALUE>
 bool Dictionary<KEY, VALUE>::isExist(KEY key, VALUE value){
     if (is_sorted_by_key) {
         Node<KEY, VALUE> *temp = findNodeByKey(root, key);
+        if (temp == nullptr) {
+            return false;
+        }
         if (temp->key == key) {
             return true;
         }
