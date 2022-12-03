@@ -286,6 +286,12 @@ private:
         counter_for_arrays += 1;
         getAllNodes(curr->right_son, ans);
     }
+//    void getAllNodesBetween(Node<KEY, VALUE>* curr, VALUE* ans, KEY compMin, KEY compMax){
+//        if (curr == nullptr){
+//            return;
+//        }
+//        if (curr->key)
+//    }
 
     void getAllNodesByKey(Node<KEY, VALUE>* curr, KEY* ans){
         if (curr == nullptr){
