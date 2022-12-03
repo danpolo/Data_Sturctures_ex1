@@ -449,7 +449,7 @@ bool runAutomaticTests(const std::vector<bool(*)()>& tests) {
     return all_tests_passed;
 }
 
-int main() {
+int main2() {
     std::cout << "Ignore this (Its for the colors)-> ";
     system(("chcp " + std::to_string(CP_UTF8)).c_str());
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
@@ -513,9 +513,6 @@ int main() {
 }
 
 
-
-
-
 void generalTest1() {
     std::cout << "Dictionary 1" << std::endl;
     int num[6] = {6,4,8,9,24,3};
@@ -545,7 +542,24 @@ void generalTest2() {
     dict2.insert(v4.getPlayerId(), &v4);
     dict2.insert(v5.getPlayerId(), &v5);
     dict2.print();
-    dict2.remove(v4.getPlayerId(), &v4);
+    dict2.remove(v5.getPlayerId(), &v5);
     std::cout << "level 1" << std::endl;
     dict2.print();
+}
+void generalTest3(){
+    std::cout << "Test3" << std::endl;
+    world_cup_t game1 = world_cup_t();
+    game1.add_team(1, 10);
+    game1.add_player(1,1,2,3,5, false);
+    game1.add_player(2,1,3,5,2, false);
+    game1.add_player(3,1,3,5,3,false);
+    game1.add_player(4,1,1,3,5,false);
+    game1.add_player(5,1,2,3,7, false);
+    game1.getPlayers();
+    game1.remove_player(5);
+    game1.getPlayers();
+}
+
+int main(){
+    generalTest3();
 }

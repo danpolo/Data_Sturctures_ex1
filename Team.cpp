@@ -7,7 +7,8 @@
 Team::Team(int teamID, int points) : teamID(teamID), m_points(points), m_games_played(0),
                                 m_number_of_players(0), m_goalKeeper_exist(0), m_strength(points),
                                 m_dict_of_players_in_team(Dictionary<int, Player*>(false)),
-                                m_top_scorer_of_team(nullptr){}
+                                m_top_scorer_of_team(nullptr),
+                                m_dict_of_players_in_team_by_key(Dictionary<int, Player*>(true)){}
 
 
 int Team::valueOfTeam() const {
@@ -79,8 +80,16 @@ bool Team::isGoalKeeperExists() const {
     return false;
 }
 
+Player *Team::findPlayerByKey(int key) {
+    return m_dict_of_players_in_team_by_key.find(key);
+}
+
 StatusType Team::add_player_in_team(int playerID, Player *pl){
     StatusType ans = m_dict_of_players_in_team.insert(playerID, pl);
+    if (ans != StatusType::SUCCESS){
+        return ans;
+    }
+    ans = m_dict_of_players_in_team_by_key.insert(playerID, pl);
     if (ans != StatusType::SUCCESS){
         return ans;
     }
@@ -112,6 +121,10 @@ StatusType Team::remove_player_in_team(int playerID, Player* pl){
     if (ans != StatusType::SUCCESS){
         return ans;
     }
+    ans = m_dict_of_players_in_team_by_key.remove(playerID, pl);
+    if (ans != StatusType::SUCCESS){
+        return ans;
+    }
     if (is_top){
         m_top_scorer_of_team = father;
     }
@@ -136,4 +149,14 @@ bool operator!=(const Team& v1, const Team& v2){
 }
 bool operator<(const Team& v1, const Team& v2){
     return v2 > v1;
+}
+Team operator-(const Team& v1, const Team& v2){
+    return Team(v1) -= v2;
+}
+
+Team &Team::operator-=(const Team &other) {  //useless
+    return *this;
+}
+bool  Team::operator/(const Team &other) const { //useless
+    return true;
 }

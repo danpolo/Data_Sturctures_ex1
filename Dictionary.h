@@ -19,9 +19,11 @@ public:
     VALUE* inorderNodesByValue();
     KEY* inorderNodesByKey();
     VALUE find(KEY key);
+    VALUE findClosestLeft(VALUE value);
+    VALUE findClosestRight(VALUE value);
     VALUE findFatherValue(VALUE value);
     bool isExist(KEY key, VALUE value = nullptr);
-//    VALUE getFarRight();
+
 private:
 
     template<class T, class S>
@@ -29,7 +31,9 @@ private:
     public:
         Node(T key, S value, Node *father) : key(key), value(value),father(father),
                                              left_son(nullptr), right_son(nullptr), bf_value(0),
-                                             height(LEAF_HEIGHT) {}
+                                             height(LEAF_HEIGHT), closest_small(nullptr),
+                                             closest_big(nullptr), inherit_closest_small(nullptr),
+                                             inherit_closest_big(nullptr){}
         Node(const Node& node) = default;
         Node& operator=(const Node& node) = default;
         ~Node() = default;
@@ -40,6 +44,14 @@ private:
         void setValue(S other_value){ value = other_value;}
         void setHeight(int new_height) {height = new_height;}
         void setBfValue(int new_bf_value) {bf_value = new_bf_value;}
+        void setClosestSmall(S other_value){ closest_small = other_value;}
+        void setClosestBig(S other_value){ closest_big = other_value;}
+        S getClosestSmall(){ return closest_small;}
+        S getClosestBig(){ return closest_big;}
+        void setInheritClosestSmall(S other_value){ inherit_closest_small = other_value;}
+        void setInheritClosestBig(S other_value){ inherit_closest_big = other_value;}
+        S getInheritClosestSmall(){ return inherit_closest_small;}
+        S getInheritClosestBig(){ return inherit_closest_big;}
 //      bool isLeaf() {((right_son == nullptr)&&(left_son == nullptr));}
         T key;
         S value;
@@ -48,6 +60,10 @@ private:
         Node* right_son;
         int bf_value;
         int height;
+        S closest_small;
+        S closest_big;
+        S inherit_closest_small;
+        S inherit_closest_big;
     };
 
     bool is_sorted_by_key;
@@ -201,7 +217,7 @@ private:
 
     }
 
-    Node<KEY, VALUE>* findNodeByValue(Node<KEY, VALUE>* current_root, VALUE value_to_find){
+    Node<KEY, VALUE>* findNodeByValue(Node<KEY, VALUE>* current_root, VALUE value_to_find, VALUE close_left, VALUE close_right){
         if (current_root == nullptr) {
             return nullptr;
         }
@@ -209,19 +225,56 @@ private:
         VALUE temp = current_root->value;
 
         if (*temp == *value_to_find){
+            current_root->setInheritClosestSmall(close_left);
+            current_root->setInheritClosestBig(close_right);
             return current_root;
         }
         if (*temp > *value_to_find) {
+            if (close_right == nullptr){
+                close_right = temp;
+            }
+            else{
+                if ((*temp - *value_to_find) / (*close_right - *value_to_find)){
+                    close_right = temp;
+                }
+            }
+            if (current_root->closest_small == nullptr){
+                current_root->closest_small = value_to_find;
+            }
+            else{
+                if ((*value_to_find - *temp) / (*current_root->closest_small - *temp)){
+                    current_root->closest_small = value_to_find;
+                }
+            }
             if (current_root->left_son == nullptr) {
+                current_root->setInheritClosestSmall(close_left);
+                current_root->setInheritClosestBig(close_right);
                 return current_root;
             }
-            return findNodeByValue(current_root->left_son, value_to_find);
+            return findNodeByValue(current_root->left_son, value_to_find, close_left, close_right);
         }
-
+        if (close_left == nullptr){
+            close_left = temp;
+        }
+        else{
+            if ((*temp - *value_to_find) / (*close_left - *value_to_find)){
+                close_left = temp;
+            }
+        }
+        if (current_root->closest_big == nullptr){
+            current_root->closest_big = value_to_find;
+        }
+        else{
+            if ((*value_to_find - *temp) / (*current_root->closest_big - *temp)){
+                current_root->closest_big = value_to_find;
+            }
+        }
         if (current_root->right_son == nullptr) {
+            current_root->setInheritClosestSmall(close_left);
+            current_root->setInheritClosestBig(close_right);
             return current_root;
         }
-        return findNodeByValue(current_root->right_son, value_to_find);
+        return findNodeByValue(current_root->right_son, value_to_find, close_left, close_right);
     }
 
     void getAllNodes(Node<KEY, VALUE>* curr, VALUE* ans){
@@ -262,6 +315,21 @@ private:
                 ro->father->setRight(nullptr);
             }
             stabilizeTree(ro->father, false);
+            Node<KEY, VALUE>* temp_lefty = nullptr;
+            Node<KEY, VALUE>* temp_righty = nullptr;
+            if (ro->getClosestSmall() != nullptr) {
+                temp_lefty = findNodeByValue(root, ro->getClosestSmall(), nullptr, nullptr);
+                temp_lefty->setClosestBig(ro->getClosestBig());
+                temp_lefty->setInheritClosestSmall(nullptr);
+                temp_lefty->setInheritClosestBig(nullptr);
+            }
+            if (ro->getClosestBig() != nullptr) {
+                temp_righty = findNodeByValue(root, ro->getClosestBig(), nullptr, nullptr);
+                temp_righty->setClosestSmall(ro->getClosestSmall());
+                temp_righty->setInheritClosestSmall(nullptr);
+                temp_righty->setInheritClosestBig(nullptr);
+            }
+            //log(n) + log(n), maybe a problem with complexity
             delete ro;
             length -= 1;
             return;
@@ -281,6 +349,11 @@ private:
                 }
             }
             stabilizeTree(ro->father, false);
+            Node<KEY, VALUE>* temp_lefty = findNodeByValue(root, ro->getClosestSmall(), nullptr, nullptr);
+            Node<KEY, VALUE>* temp_righty = findNodeByValue(root, ro->getClosestBig(), nullptr, nullptr);
+            //log(n) + log(n), maybe a problem with complexity
+            temp_lefty->setClosestBig(ro->getClosestBig());
+            temp_righty->setClosestSmall(ro->getClosestSmall());
             delete ro;
             length -= 1;
             return;
@@ -300,6 +373,11 @@ private:
                 }
             }
             stabilizeTree(ro->father, false);
+            Node<KEY, VALUE>* temp_lefty = findNodeByValue(root, ro->getClosestSmall(), nullptr, nullptr);
+            Node<KEY, VALUE>* temp_righty = findNodeByValue(root, ro->getClosestBig(), nullptr, nullptr);
+            //log(n) + log(n), maybe a problem with complexity
+            temp_lefty->setClosestBig(ro->getClosestBig());
+            temp_righty->setClosestSmall(ro->getClosestSmall());
             delete ro;
             length -= 1;
             return;
@@ -310,10 +388,16 @@ private:
         }
         KEY temp_key = ro->key;
         VALUE temp_value = ro->value;
+        VALUE temp_close_lefty = ro->getClosestSmall();
+        VALUE temp_close_righty = ro->getClosestBig();
         ro->setKey(nearest->key);
         ro->setValue(nearest->value);
+        ro->setClosestSmall(nearest->getClosestSmall());
+        ro->setClosestBig(nearest->getClosestBig());
         nearest->setKey(temp_key);
         nearest->setValue(temp_value);
+        nearest->setClosestSmall(temp_close_lefty);
+        nearest->setClosestBig(temp_close_righty);
         removeNode(nearest);
     }
 
@@ -335,6 +419,7 @@ private:
             return StatusType::FAILURE;
         }
         Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, optional_father);
+        // try catch to allocation error?
         if (key < optional_father->key){
             optional_father->setLeft(son);
         }
@@ -347,8 +432,15 @@ private:
     }
 
     StatusType insertValue(KEY key, VALUE value){
-        Node<KEY, VALUE>* optional_father = findNodeByValue(root, value);
+        VALUE closest_small = nullptr;
+        VALUE closest_big = nullptr;
+        Node<KEY, VALUE>* optional_father = findNodeByValue(root, value, closest_small, closest_big);
         Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, optional_father);
+        // try catch to allocation error?
+        son->setClosestBig(optional_father->getInheritClosestBig());
+        son->setClosestSmall(optional_father->getInheritClosestSmall());
+        optional_father->setInheritClosestSmall(nullptr);
+        optional_father->setInheritClosestBig(nullptr);
         if (*value < *optional_father->value){
             optional_father->setLeft(son);
         }
@@ -361,9 +453,6 @@ private:
     }
 };
 
-//template<class KEY, class VALUE>
-//Dictionary<KEY, VALUE>::Dictionary(bool is_sorted_by_key) : is_sorted_by_key(is_sorted_by_key),
-//                                                            root(nullptr), length(0){}
 
 template<class KEY, class VALUE>
 StatusType Dictionary<KEY, VALUE>::insert(KEY key, VALUE value) {
@@ -398,17 +487,19 @@ StatusType Dictionary<KEY, VALUE>::remove(KEY key, VALUE value) {
         removeNode(temp);
         return StatusType::SUCCESS;
     }
-    Node<KEY, VALUE> *temp = findNodeByValue(root, value);
+    Node<KEY, VALUE> *temp = findNodeByValue(root, value, nullptr, nullptr);
     if (*temp->value != *value)
     {
         return StatusType::FAILURE;
     }
+    temp->setInheritClosestSmall(nullptr);
+    temp->setInheritClosestBig(nullptr);
     removeNode(temp);
     return StatusType::SUCCESS;
 }
 
 template<class KEY, class VALUE>
-VALUE Dictionary<KEY, VALUE>::find(KEY key) {
+VALUE Dictionary<KEY, VALUE>::find(KEY key){
     Node<KEY, VALUE>* node = findNodeByKey(root, key);
     if (node == nullptr) {
         return nullptr;
@@ -417,8 +508,8 @@ VALUE Dictionary<KEY, VALUE>::find(KEY key) {
 }
 
 template<class KEY, class VALUE>
-VALUE Dictionary<KEY, VALUE>::findFatherValue(VALUE value) {
-    Node<KEY, VALUE>* temp = findNodeByValue(root, value)->father;
+VALUE Dictionary<KEY, VALUE>::findFatherValue(VALUE value){
+    Node<KEY, VALUE>* temp = findNodeByValue(root, value, nullptr, nullptr)->father;
     if (temp == nullptr){
         return nullptr;
     }
@@ -426,7 +517,7 @@ VALUE Dictionary<KEY, VALUE>::findFatherValue(VALUE value) {
 }
 
 template<class KEY, class VALUE>
-bool Dictionary<KEY, VALUE>::isExist(KEY key, VALUE value) {
+bool Dictionary<KEY, VALUE>::isExist(KEY key, VALUE value){
     if (is_sorted_by_key) {
         Node<KEY, VALUE> *temp = findNodeByKey(root, key);
         if (temp->key == key) {
@@ -434,11 +525,21 @@ bool Dictionary<KEY, VALUE>::isExist(KEY key, VALUE value) {
         }
         return false;
     }
-    Node<KEY, VALUE> *temp = findNodeByValue(root, value);
+    Node<KEY, VALUE> *temp = findNodeByValue(root, value, nullptr, nullptr);
     if (temp->key == key){
         return true;
     }
     return false;
+}
+template<class KEY, class VALUE>
+VALUE Dictionary<KEY, VALUE>::findClosestLeft(VALUE value) {
+    Node<KEY, VALUE>* temp = findNodeByValue(root, value, nullptr, nullptr);
+    return temp->getClosestSmall();
+}
+template<class KEY, class VALUE>
+VALUE Dictionary<KEY, VALUE>::findClosestRight(VALUE value) {
+    Node<KEY, VALUE>* temp = findNodeByValue(root, value, nullptr, nullptr);
+    return temp->getClosestBig();
 }
 
 //template<class KEY, class VALUE>

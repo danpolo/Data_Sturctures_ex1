@@ -70,6 +70,16 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
             return ans1;
         }
         ans1 = m_dict_of_players_by_value.insert(playerId, temp_player);
+        Player* temp_player_left = m_dict_of_players_by_value.findClosestLeft(temp_player);
+        Player* temp_player_right = m_dict_of_players_by_value.findClosestRight(temp_player);
+        temp_player->setClosestLeft(temp_player_left);
+        temp_player->setClosestRight(temp_player_right);
+        if (temp_player_left != nullptr) {
+            temp_player_left->setClosestRight(temp_player);
+        }
+        if (temp_player_right != nullptr) {
+            temp_player_right->setClosestLeft(temp_player);
+        }
         if (ans1 != StatusType::SUCCESS){
             delete temp_player;
             return ans1;
@@ -118,6 +128,16 @@ StatusType world_cup_t::remove_player(int playerId)
     StatusType ans = m_dict_of_players_by_value.remove(playerId, temp_player);
     if (ans != StatusType::SUCCESS){
         return ans;
+    }
+    Player* temp_player_left = temp_player->getClosestLeft();
+    Player* temp_player_right = temp_player->getClosestRight();
+    temp_player->setClosestLeft(nullptr);
+    temp_player->setClosestRight(nullptr);
+    if (temp_player_left != nullptr) {
+        temp_player_left->setClosestRight(temp_player_right);
+    }
+    if (temp_player_right != nullptr) {
+        temp_player_right->setClosestLeft(temp_player_left);
     }
     StatusType ans2 = m_dict_of_players_by_key.remove(playerId, temp_player);
     if (ans2 != StatusType::SUCCESS){
@@ -357,8 +377,21 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
 
 output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
 {
-	// TODO: Your code goes here
-	return 1006;
+    if ((playerId <= 0) || (teamId <= 0)){
+        return StatusType::INVALID_INPUT;
+    }
+    if (m_players_total == 1){
+        return StatusType::FAILURE;
+    }
+	Team* curr_team = m_dict_of_active_teams.find(teamId);
+    Player* curr_player = curr_team->findPlayerByKey(playerId);
+    if (curr_player->getPlayerId() != playerId){
+        return StatusType::FAILURE;
+    }
+    if ((*curr_player->getClosestLeft() - *curr_player) / (*curr_player->getClosestRight() - *curr_player)){
+        return curr_player->getClosestLeft()->getPlayerId();
+    }
+	return curr_player->getClosestRight()->getPlayerId();
 }
 
 output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
@@ -367,6 +400,6 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
 	return 2;
 }
 
-void world_cup_t::getTeams(){
-    m_dict_of_active_teams.print();
+void world_cup_t::getPlayers(){
+    m_dict_of_players_by_value.print();
 }

@@ -12,6 +12,7 @@ class Team
 {
 public:
     Team(int teamID, int points = 0);
+    Team(const Team& other) = default;
     StatusType add_player_in_team(int playerID, Player* pl);
     StatusType remove_player_in_team(int playerID, Player* pl);
     void move_all_players(Team* team2);
@@ -30,6 +31,9 @@ public:
     bool isValidTeam() const;
     bool operator>(const Team& other) const;
     bool operator==(const Team& other) const;
+    Team& operator-=(const Team& other);
+    Player* findPlayerByKey(int key);
+    bool operator/(const Team& other) const;
     int* getAllPlayersInTeam();
     //Output_t<int> getTopScorer();
 
@@ -43,9 +47,11 @@ private:
     int m_number_of_players;
     int m_goalKeeper_exist;
     Dictionary<int, Player*> m_dict_of_players_in_team;
+    Dictionary<int, Player*> m_dict_of_players_in_team_by_key;
     Player* m_top_scorer_of_team;
 };
 bool operator!=(const Team& v1, const Team& v2);
 bool operator<(const Team& v1, const Team& v2);
+Team operator-(const Team& v1, const Team& v2);
 
 #endif //EX1_TEAM_H
