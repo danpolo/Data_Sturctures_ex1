@@ -1034,12 +1034,14 @@ bool getAllPlayersTestPlayersOrder() {
         game.add_team(i, 0);
     }
 
+    const int REPETITIONS = 50;
+
     std::random_device dev;
     std::mt19937 rng(dev());
-    std::uniform_int_distribution<std::mt19937::result_type> dist1(1,1000000);
+    std::uniform_int_distribution<std::mt19937::result_type> dist1(1,10*REPETITIONS);
     std::uniform_int_distribution<std::mt19937::result_type> dist2(1,10);
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < REPETITIONS; i++) {
         game.add_player(dist1(rng), dist2(rng), 1, 1, 1, false);
     }
 
@@ -1047,12 +1049,140 @@ bool getAllPlayersTestPlayersOrder() {
     int players[players_count];
     game.get_all_players(-1, players);
 
-    for (int i = 0; i < 999; i++) {
+    for (int i = 0; i < players_count - 1; i++) {
         if (players[i+1] <= players[i]) {
             return false;
         }
     }
     return true;
+}
+
+bool getClosestPlayerInvalidPlayerId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 1, 1, 1, 1, false);
+    return game.get_closest_player(0, 1).status() == StatusType::INVALID_INPUT;
+}
+
+bool getClosestPlayerInvalidTeamId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 1, 1, 1, 1, false);
+    return game.get_closest_player(1, 0).status() == StatusType::INVALID_INPUT;
+}
+
+bool getClosestPlayerPlayerDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 1, 1, 1, 1, false);
+    return game.get_closest_player(3, 1).status() == StatusType::FAILURE;
+}
+
+bool getClosestPlayerPlayerInWrongTeam() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 2, 1, 1, 1, false);
+    return game.get_closest_player(2, 1).status() == StatusType::FAILURE;
+}
+
+bool getClosestPlayerTeamDoesntExist() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 1, 1, 1, 1, false);
+    return game.get_closest_player(1, 2).status() == StatusType::FAILURE;
+}
+
+bool getClosestPlayerOnePlayer() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 2, 1, 1, 1, false);
+    game.remove_player(2);
+    return game.get_closest_player(1, 1).status() == StatusType::FAILURE;
+}
+
+bool getClosestPlayerMiddleSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 1, 1, 2, 1, false);
+    game.add_player(3, 2, 1, 3, 1, false);
+    return game.get_closest_player(2, 1).status() == StatusType::SUCCESS;
+}
+
+bool getClosestPlayerFirstSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 1, 1, 2, 1, false);
+    game.add_player(3, 2, 1, 3, 1, false);
+    return game.get_closest_player(1, 1).status() == StatusType::SUCCESS;
+}
+
+bool getClosestPlayerLastSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    game.add_player(1, 1, 1, 1, 1, false);
+    game.add_player(2, 1, 1, 2, 1, false);
+    game.add_player(3, 2, 1, 3, 1, false);
+    return game.get_closest_player(3, 2).status() == StatusType::SUCCESS;
+}
+
+bool getClosestPlayerTestFromExample() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_player(21, 1, 1, 1, 20, false);
+    game.add_player(25, 1, 1, 1, 20, false);
+    game.add_player(3, 1, 1, 1, 5, false);
+    game.add_player(4, 1, 1, 1, 1, false);
+    game.add_player(5, 1, 1, 2, 5, false);
+    game.add_player(6, 1, 1, 2, 4, false);
+    game.add_player(24, 1, 1, 2, 3, false);
+    game.add_player(7, 1, 1, 2, 2, false);
+    game.add_player(8, 1, 1, 2, 1, false);
+    game.add_player(9, 1, 1, 5, 30, false);
+    game.add_player(10, 1, 1, 5, 29, false);
+    game.add_player(11, 1, 1, 5, 28, false);
+    game.add_player(12, 1, 1, 5, 27, false);
+    game.add_player(51, 1, 1, 6, 40, false);
+    game.add_player(52, 1, 1, 6, 40, false);
+    game.add_player(53, 1, 1, 6, 40, false);
+    game.add_player(54, 1, 1, 6, 10, false);
+    game.add_player(60, 1, 1, 6, 5, false);
+    game.add_player(100, 1, 1, 8, 6, false);
+    game.add_player(80, 1, 1, 10, 7, false);
+    game.add_player(90, 1, 1, 10, 7, false);
+    return game.get_closest_player(21, 1).ans() == 25;// and game.get_closest_player(25, 1).ans() ==
+   // 21 and game.get_closest_player(3, 1).ans() == 4 and game.get_closest_player(4, 3).ans() == 25;
+  //  and game.get_closest_player(5, 1).ans() == 6 and game.get_closest_player(6, 1).ans() == 5 and
+  //  game.get_closest_player(24, 1).ans() == 7 and game.get_closest_player(7, 1).ans() == 8 and
+   // game.get_closest_player(8, 1).ans() == 7 and game.get_closest_player(9, 1).ans() == 10 and
+   // game.get_closest_player(10, 1).ans() == 11 and game.get_closest_player(11, 1).ans() == 12 and
+   // game.get_closest_player(12, 1).ans() == 11 and game.get_closest_player(51, 1).ans() == 52 and
+   // game.get_closest_player(52, 1).ans() == 53 and game.get_closest_player(53, 1).ans() == 52 and
+    //game.get_closest_player(54, 1).ans() == 60 and game.get_closest_player(60, 1).ans() == 70 and
+    //game.get_closest_player(70, 1).ans() == 60 and game.get_closest_player(100, 1).ans() == 80
+    //and game.get_closest_player(80, 1).ans() == 90 and game.get_closest_player(90, 1).ans() == 80;
 }
 
 bool runAutomaticTests(const std::vector<bool(*)()>& tests) {
@@ -1157,7 +1287,17 @@ int main() {
                                               &getAllPlayersSuccess,
                                               &getAllPlayersTestValueInTeam,
                                               &getAllPlayersTestValueInAllTeams,
-                                              &getAllPlayersTestPlayersOrder};
+                                              &getAllPlayersTestPlayersOrder,
+                                              getClosestPlayerInvalidPlayerId,
+                                              &getClosestPlayerInvalidTeamId,
+                                              &getClosestPlayerPlayerDoesntExist,
+                                              &getClosestPlayerPlayerInWrongTeam,
+                                              &getClosestPlayerTeamDoesntExist,
+                                              &getClosestPlayerOnePlayer,
+                                              &getClosestPlayerMiddleSuccess,
+                                              &getClosestPlayerFirstSuccess,
+                                              &getClosestPlayerLastSuccess,
+                                              &getClosestPlayerTestFromExample};
 
     std::vector<void(*)()> manual_tests = {&testSingleRrRotationByKey,
                                            &testSingleLlRotationByKey,

@@ -80,10 +80,12 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
         Player* temp_player_right = m_dict_of_players_by_value.findClosestRight(temp_player);
         temp_player->setClosestLeft(temp_player_left);
         temp_player->setClosestRight(temp_player_right);
-        if (temp_player_left != nullptr) {
+        if ((temp_player_left != nullptr) and ((*temp_player - *temp_player_left) /
+        (*temp_player_left->getClosestRight() - *temp_player_left) )){
             temp_player_left->setClosestRight(temp_player);
         }
-        if (temp_player_right != nullptr) {
+        if ((temp_player_right != nullptr) and ((*temp_player - *temp_player_right) /
+        (*temp_player_right->getClosestLeft() - *temp_player_right))) {
             temp_player_right->setClosestLeft(temp_player);
         }
 
@@ -399,9 +401,18 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
         return StatusType::FAILURE;
     }
 	Team* curr_team = m_dict_of_active_teams.find(teamId);
+    if (curr_team->getID() != teamId) {
+        return StatusType::FAILURE;
+    }
     Player* curr_player = curr_team->findPlayerByKey(playerId);
     if (curr_player->getPlayerId() != playerId){
         return StatusType::FAILURE;
+    }
+    if (curr_player->getClosestLeft() == nullptr) {
+        return curr_player->getClosestRight()->getPlayerId();
+    }
+    if (curr_player->getClosestRight() == nullptr) {
+        return curr_player->getClosestLeft()->getPlayerId();
     }
     if ((*curr_player->getClosestLeft() - *curr_player) / (*curr_player->getClosestRight() - *curr_player)){
         return curr_player->getClosestLeft()->getPlayerId();

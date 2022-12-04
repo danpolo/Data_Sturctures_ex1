@@ -94,6 +94,7 @@ private:
     }
 
     void stabilizeTree(Node<KEY, VALUE>* node, bool is_insert=true) {
+        //return; //REMOVE
         if (node == nullptr) {
             return;
         }
