@@ -80,12 +80,14 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
         Player* temp_player_right = m_dict_of_players_by_value.findClosestRight(temp_player);
         temp_player->setClosestLeft(temp_player_left);
         temp_player->setClosestRight(temp_player_right);
-        if ((temp_player_left != nullptr) and ((*temp_player - *temp_player_left) /
-        (*temp_player_left->getClosestRight() - *temp_player_left) )){
+        if ((temp_player_left != nullptr) and (temp_player_left->getClosestRight() == nullptr or
+        ((*temp_player - *temp_player_left) / (*temp_player_left->getClosestRight() -
+        *temp_player_left)))){
             temp_player_left->setClosestRight(temp_player);
         }
-        if ((temp_player_right != nullptr) and ((*temp_player - *temp_player_right) /
-        (*temp_player_right->getClosestLeft() - *temp_player_right))) {
+        if ((temp_player_right != nullptr) and (temp_player_right->getClosestLeft() == nullptr or
+        ((*temp_player - *temp_player_right) / (*temp_player_right->getClosestLeft() -
+        *temp_player_right)))) {
             temp_player_right->setClosestLeft(temp_player);
         }
 
