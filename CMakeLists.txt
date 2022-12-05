@@ -8,4 +8,4 @@ include_directories(.)
 #add_executable(ex1 main23a1.cpp wet1util.h worldcup23a1.cpp worldcup23a1.h Team.cpp Team.h Player.cpp Player.h
 #        Dictionary.h)
 
-add_executable(Dictionary.h Mytests.cpp Player.h Player.cpp worldcup23a1.cpp worldcup23a1.h Team.cpp Team.h Player.cpp  Player.h )
+add_executable(Dictionary.h main23a1.cpp Player.h Player.cpp worldcup23a1.cpp worldcup23a1.h Team.cpp Team.h Player.cpp Player.h)

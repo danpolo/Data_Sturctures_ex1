@@ -128,6 +128,9 @@ private:
         node->setFather(node->left_son);
         node->left_son->setRight(node);
         node->setLeft(right_son_of_left_son);
+        if (right_son_of_left_son != nullptr) {
+            right_son_of_left_son->setFather(node);
+        }
         node->father->setFather(father);
 
         if (father != nullptr) {
@@ -158,6 +161,9 @@ private:
         node->setFather(node->right_son);
         node->right_son->setLeft(node);
         node->setRight(left_son_of_right_son);
+        if (left_son_of_right_son != nullptr) {
+            left_son_of_right_son->setFather(node);
+        }
         node->father->setFather(father);
 
         if (father != nullptr) {

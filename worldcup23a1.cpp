@@ -577,5 +577,4 @@ void world_cup_t::getTeams(){
     validTeams[0]->addStrength(validTeams[0]->getCompensationStrength());
     std::cout << "The winner is" << std::endl;
     std::cout << validTeams[0]->getID() << std::endl;
-
 }
