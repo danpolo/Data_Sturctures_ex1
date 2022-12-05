@@ -39,6 +39,11 @@ public:
     void addCompensationPoints(int points);
     int getCompensationStrength() const;
     void addCompensationStrength(int strength);
+
+    void setClosestLeft(Team* other);
+    void setClosestRight(Team* other);
+    Team* getClosestLeft();
+    Team* getClosestRight();
     //Output_t<int> getTopScorer();
 
     ~Team() = default;

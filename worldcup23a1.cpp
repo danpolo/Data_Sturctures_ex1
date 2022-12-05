@@ -76,6 +76,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
             delete temp_player;
             return ans1;
         }
+        /*
         Player* temp_player_left = m_dict_of_players_by_value.findClosestLeft(temp_player);
         Player* temp_player_right = m_dict_of_players_by_value.findClosestRight(temp_player);
         temp_player->setClosestLeft(temp_player_left);
@@ -90,7 +91,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
         *temp_player_right)))) {
             temp_player_right->setClosestLeft(temp_player);
         }
-
+        */
         Team* temp_team = m_dict_of_teams.find(teamId);
         if (temp_team == nullptr || temp_team->getID() != teamId){
             return StatusType::FAILURE;

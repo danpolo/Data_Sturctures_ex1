@@ -107,6 +107,9 @@ private:
             else {
                 LLRotation(node);
             }
+            if (is_insert) {
+                return;
+            }
         }
         else if (node->bf_value == -2) {
             if (node->right_son->bf_value == 1) {
@@ -114,6 +117,9 @@ private:
             }
             else {
                 RRRotation(node);
+            }
+            if (is_insert) {
+                return;
             }
         }
         node->setHeight(getHeight(node));
@@ -231,8 +237,8 @@ private:
         VALUE temp = current_root->value;
 
         if (*temp == *value_to_find){
-            current_root->setInheritClosestSmall(close_left);
-            current_root->setInheritClosestBig(close_right);
+            value_to_find->setClosestLeft(close_left);
+            value_to_find->setClosestRight(close_right);
             return current_root;
         }
         if (*temp > *value_to_find) {
@@ -245,16 +251,16 @@ private:
                 }
             }
             if (current_root->closest_small == nullptr){
-                current_root->closest_small = value_to_find;
+                current_root->value->setClosestLeft(value_to_find);
             }
             else{
-                if ((*value_to_find - *temp) / (*current_root->closest_small - *temp)){
-                    current_root->closest_small = value_to_find;
+                if ((*value_to_find - *temp) / (*(current_root->value->getClosestLeft()) - *temp)){
+                    current_root->value->setClosestLeft(value_to_find);
                 }
             }
             if (current_root->left_son == nullptr) {
-                current_root->setInheritClosestSmall(close_left);
-                current_root->setInheritClosestBig(close_right);
+                value_to_find->setClosestLeft(close_left);
+                value_to_find->setClosestRight(close_right);
                 return current_root;
             }
             return findNodeByValue(current_root->left_son, value_to_find, close_left, close_right);
@@ -268,16 +274,16 @@ private:
             }
         }
         if (current_root->closest_big == nullptr){
-            current_root->closest_big = value_to_find;
+            current_root->value->setClosestRight(value_to_find);
         }
         else{
-            if ((*value_to_find - *temp) / (*current_root->closest_big - *temp)){
-                current_root->closest_big = value_to_find;
+            if ((*value_to_find - *temp) / (*(current_root->value->getClosestRight()) - *temp)){
+                current_root->value->setClosestRight(value_to_find);
             }
         }
         if (current_root->right_son == nullptr) {
-            current_root->setInheritClosestSmall(close_left);
-            current_root->setInheritClosestBig(close_right);
+            value_to_find->setClosestLeft(close_left);
+            value_to_find->setClosestRight(close_right);
             return current_root;
         }
         return findNodeByValue(current_root->right_son, value_to_find, close_left, close_right);
@@ -462,10 +468,10 @@ private:
         Node<KEY, VALUE>* optional_father = findNodeByValue(root, value, closest_small, closest_big);
         Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, optional_father);
         // try catch to allocation error?
-        son->setClosestBig(optional_father->getInheritClosestBig());
-        son->setClosestSmall(optional_father->getInheritClosestSmall());
-        optional_father->setInheritClosestSmall(nullptr);
-        optional_father->setInheritClosestBig(nullptr);
+        //son->setClosestBig(optional_father->getInheritClosestBig());
+        //son->setClosestSmall(optional_father->getInheritClosestSmall());
+        //optional_father->setInheritClosestSmall(nullptr);
+        //optional_father->setInheritClosestBig(nullptr);
         if (*value < *optional_father->value){
             optional_father->setLeft(son);
         }

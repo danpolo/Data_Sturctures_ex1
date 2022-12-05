@@ -35,6 +35,8 @@ public:
     void setClosestLeft(Player* other);
     void setClosestRight(Player* other);
 
+
+
 private:
     int player_id;
     int team_id;

@@ -177,3 +177,20 @@ Team &Team::operator-=(const Team &other) {  //useless
 bool  Team::operator/(const Team &other) const { //useless
     return true;
 }
+
+void Team::setClosestLeft(Team *other) {
+
+}
+
+void Team::setClosestRight(Team *other) {
+
+}
+
+Team *Team::getClosestLeft() {
+    return nullptr;
+}
+
+Team *Team::getClosestRight() {
+    return nullptr;
+}
+

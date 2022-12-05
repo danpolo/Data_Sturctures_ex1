@@ -30,7 +30,7 @@ void printFunctionName(std::string str) {
     }
     std::cout << "Running test: " << out << std::string(MAX_LINE_LENGTH - out.length(), ' ');
 }
-
+/*
 bool findInEmptyDictionaryByKey() {
     printFunctionName(__FUNCTION__);
     Dictionary<int, int*> dict = Dictionary<int, int*>(true);
@@ -258,7 +258,7 @@ void testMultiplyRotationsAfterRemovalByKey() {
     dict.remove(1, elements + 3);
     dict.print();
 }
-
+*/
 bool constructorCrush() {
     printFunctionName(__FUNCTION__);
     try {
@@ -1034,26 +1034,37 @@ bool getAllPlayersTestPlayersOrder() {
         game.add_team(i, 0);
     }
 
-    const int REPETITIONS = 50;
+    const int REPETITIONS = 100;
 
     std::random_device dev;
     std::mt19937 rng(dev());
     std::uniform_int_distribution<std::mt19937::result_type> dist1(1,10*REPETITIONS);
     std::uniform_int_distribution<std::mt19937::result_type> dist2(1,10);
 
+    int player_ids[REPETITIONS];
+    int team_ids[REPETITIONS];
+
     for (int i = 0; i < REPETITIONS; i++) {
-        game.add_player(dist1(rng), dist2(rng), 1, 1, 1, false);
+        player_ids[i] = dist1(rng);
+        team_ids[i] = dist2(rng);
     }
 
-    int players_count = game.get_all_players_count(-1).ans();
-    int players[players_count];
-    game.get_all_players(-1, players);
+    for (int i = 0; i < REPETITIONS; i++) {
+        game.add_player(player_ids[i], team_ids[i], 1, 1, 1, false);
+        if (i == 71) {
+            int x = 1;
+        }
+        int players_count = game.get_all_players_count(-1).ans();
+        int players[players_count];
+        game.get_all_players(-1, players);
 
-    for (int i = 0; i < players_count - 1; i++) {
-        if (players[i+1] <= players[i]) {
-            return false;
+        for (int j = 0; j < players_count - 1; j++) {
+            if (players[j+1] <= players[j]) {
+                return false;
+            }
         }
     }
+
     return true;
 }
 
@@ -1212,12 +1223,7 @@ int main() {
     system(("chcp " + std::to_string(CP_UTF8)).c_str());
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
 
-    std::vector<bool(*)()> automatic_tests = {&findInEmptyDictionaryByKey, &findInEmptyDictionaryByValue,
-                                              &findInOneElementDictionaryByKey,
-                                              &findInOneElementDictionaryByValue,
-                                              &findMissingElementInOneElementDictionaryByKey,
-                                              &findMissingElementInOneElementDictionaryByValue,
-                                              &findElementAfterRemoval, &constructorCrush,
+    std::vector<bool(*)()> automatic_tests = {&constructorCrush,
                                               &addTeamInvalidInputId, &addTeamInvalidInputPoints,
                                               &addTeamSuccess, &addTeamAlreadyExistingTeam,
                                               &removeTeamSuccess, &removeTeamInvalidId,
@@ -1299,7 +1305,7 @@ int main() {
                                               &getClosestPlayerLastSuccess,
                                               &getClosestPlayerTestFromExample};
 
-    std::vector<void(*)()> manual_tests = {&testSingleRrRotationByKey,
+    /*std::vector<void(*)()> manual_tests = {&testSingleRrRotationByKey,
                                            &testSingleLlRotationByKey,
                                            &testSingleRlRotationByKey,
                                            &testSingleLrRotationByKey,
@@ -1314,7 +1320,7 @@ int main() {
                                            &testSingleRlRotationAfterRemovalByKey,
                                            &testRotationAfterRemovalByKey,
                                            &testMultiplyRotationsAfterRemovalByKey};
-
+*/
     if (runAutomaticTests(automatic_tests)) {
         std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
         std::cout << "\033[1;32mALL TESTS PASSED!!!\033[0m" << std::endl;
@@ -1326,15 +1332,15 @@ int main() {
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
     std::cout << "Running Manual Tests" << std::endl;
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
-
+    /*
     for (auto test : manual_tests) {
         test();
     }
-
+*/
     return 0;
 }
 
-
+/*
 void generalTest1() {
     std::cout << "Dictionary 1" << std::endl;
     int num[6] = {6,4,8,9,24,3};
@@ -1424,3 +1430,4 @@ void generalTest3(){
 int main2(){
     generalTest3();
 }
+ */
