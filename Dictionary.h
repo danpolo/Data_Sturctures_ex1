@@ -224,25 +224,16 @@ private:
         VALUE temp = current_root->value;
 
         if (*temp == *value_to_find){
-            value_to_find->setClosestLeft(close_left);
-            value_to_find->setClosestRight(close_right);
             return current_root;
         }
         if (*temp > *value_to_find) {
-            if (close_right == nullptr){
-                close_right = temp;
+            close_right = temp;
+            if (temp->getClosestLeft() == nullptr){
+                temp->setClosestLeft(value_to_find);
             }
             else{
-                if ((*temp - *value_to_find) / (*close_right - *value_to_find)){
-                    close_right = temp;
-                }
-            }
-            if (current_root->closest_small == nullptr){
-                current_root->value->setClosestLeft(value_to_find);
-            }
-            else{
-                if ((*value_to_find - *temp) / (*(current_root->value->getClosestLeft()) - *temp)){
-                    current_root->value->setClosestLeft(value_to_find);
+                if ((*value_to_find) > (*(temp->getClosestLeft()))){
+                    temp->setClosestLeft(value_to_find);
                 }
             }
             if (current_root->left_son == nullptr) {
@@ -252,20 +243,13 @@ private:
             }
             return findNodeByValue(current_root->left_son, value_to_find, close_left, close_right);
         }
-        if (close_left == nullptr){
-            close_left = temp;
+        close_left = temp;
+        if (temp->getClosestRight() == nullptr){
+            temp->setClosestRight(value_to_find);
         }
         else{
-            if ((*temp - *value_to_find) / (*close_left - *value_to_find)){
-                close_left = temp;
-            }
-        }
-        if (current_root->value->getClosestRight() == nullptr){
-            current_root->value->setClosestRight(value_to_find);
-        }
-        else{
-            if ((*value_to_find - *temp) / (*(current_root->value->getClosestRight()) - *temp)){
-                current_root->value->setClosestRight(value_to_find);
+            if ((*value_to_find) < (*(temp->getClosestRight()))){
+                temp->setClosestRight(value_to_find);
             }
         }
         if (current_root->right_son == nullptr) {
@@ -329,8 +313,14 @@ private:
                 ro->father->setRight(nullptr);
             }
             stabilizeTree(ro->father, false);
-            findNodeByValue(root, ro->value->getClosestLeft(), nullptr, nullptr);
-            findNodeByValue(root, ro->value->getClosestRight(), nullptr, nullptr);
+            if (ro->value->getClosestLeft() != nullptr) {
+                ro->value->getClosestLeft()->setClosestRight(ro->value->getClosestRight());
+            }
+            if (ro->value->getClosestRight() != nullptr) {
+                ro->value->getClosestRight()->setClosestLeft(ro->value->getClosestLeft());
+            }
+            ro->value->setClosestRight(nullptr);
+            ro->value->setClosestLeft(nullptr);
             //log(n) + log(n), maybe a problem with complexity
             delete ro;
             length -= 1;
@@ -352,14 +342,14 @@ private:
             }
             stabilizeTree(ro->father, false);
             //log(n) + log(n), maybe a problem with complexity
-            if (ro->getClosestSmall() != nullptr) {
-                Node<KEY, VALUE>* temp_lefty = findNodeByValue(root, ro->getClosestSmall(), nullptr, nullptr);
-                temp_lefty->setClosestBig(ro->getClosestBig());
+            if (ro->value->getClosestLeft() != nullptr) {
+                ro->value->getClosestLeft()->setClosestRight(ro->value->getClosestRight());
             }
-            if (ro->getClosestBig() != nullptr) {
-                Node<KEY, VALUE>* temp_righty = findNodeByValue(root, ro->getClosestBig(), nullptr, nullptr);
-                temp_righty->setClosestSmall(ro->getClosestSmall());
+            if (ro->value->getClosestRight() != nullptr) {
+                ro->value->getClosestRight()->setClosestLeft(ro->value->getClosestLeft());
             }
+            ro->value->setClosestRight(nullptr);
+            ro->value->setClosestLeft(nullptr);
             delete ro;
             length -= 1;
             return;
@@ -379,11 +369,15 @@ private:
                 }
             }
             stabilizeTree(ro->father, false);
-            Node<KEY, VALUE>* temp_lefty = findNodeByValue(root, ro->getClosestSmall(), nullptr, nullptr);
-            Node<KEY, VALUE>* temp_righty = findNodeByValue(root, ro->getClosestBig(), nullptr, nullptr);
             //log(n) + log(n), maybe a problem with complexity
-            temp_lefty->setClosestBig(ro->getClosestBig());
-            temp_righty->setClosestSmall(ro->getClosestSmall());
+            if (ro->value->getClosestLeft() != nullptr) {
+                ro->value->getClosestLeft()->setClosestRight(ro->value->getClosestRight());
+            }
+            if (ro->value->getClosestRight() != nullptr) {
+                ro->value->getClosestRight()->setClosestLeft(ro->value->getClosestLeft());
+            }
+            ro->value->setClosestRight(nullptr);
+            ro->value->setClosestLeft(nullptr);
             delete ro;
             length -= 1;
             return;
@@ -394,16 +388,15 @@ private:
         }
         KEY temp_key = ro->key;
         VALUE temp_value = ro->value;
-        VALUE temp_close_lefty = ro->getClosestSmall();
-        VALUE temp_close_righty = ro->getClosestBig();
+        VALUE temp_close_righty = ro->value->getClosestRight();
         ro->setKey(nearest->key);
         ro->setValue(nearest->value);
-        ro->setClosestSmall(nearest->getClosestSmall());
-        ro->setClosestBig(nearest->getClosestBig());
+        ro->value->setClosestLeft(nearest->value->getClosestLeft());
+        ro->value->setClosestRight(nearest->value);
         nearest->setKey(temp_key);
         nearest->setValue(temp_value);
-        nearest->setClosestSmall(temp_close_lefty);
-        nearest->setClosestBig(temp_close_righty);
+        nearest->value->setClosestLeft(ro->value);
+        nearest->value->setClosestRight(temp_close_righty);
         removeNode(nearest);
     }
 
@@ -510,7 +503,7 @@ VALUE Dictionary<KEY, VALUE>::find(KEY key){
     if (node == nullptr) {
         return nullptr;
     }
-    return findNodeByKey(root, key)->value;
+    return node->value;
 }
 
 template<class KEY, class VALUE>
