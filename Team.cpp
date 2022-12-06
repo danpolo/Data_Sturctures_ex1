@@ -46,7 +46,8 @@ void Team::addPoints(int points) {
 }
 
 void Team::move_all_players(Team *team2) {   //maybe need to catch an allocation error
-    Player** moving_players = team2->m_dict_of_players_in_team.inorderNodesByValue();
+    Player** moving_players_begin = team2->m_dict_of_players_in_team.inorderNodesByValue();
+    Player** moving_players = moving_players_begin;
     int number_of_players_to_move = team2->numberOfPlayers();
     int i = 0;
     while (i < number_of_players_to_move){
@@ -57,6 +58,7 @@ void Team::move_all_players(Team *team2) {   //maybe need to catch an allocation
         i++;
         moving_players++;
     }
+    delete[] moving_players_begin;
 }
 
 bool Team::operator>(const Team &other) const {

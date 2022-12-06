@@ -382,6 +382,7 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
             output[i] = answer[i];
             i++;
         }
+        delete[] answer;
     }
     else{
         if (m_players_total == 0){
@@ -393,7 +394,9 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
             output[i] = answer[i];
             i++;
         }
+        delete[] answer;
     }
+
 	return StatusType::SUCCESS;
     //maybe need to catch an allocation error
 }
@@ -507,6 +510,8 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
     }
     validTeams[0]->addPoints(validTeams[0]->getCompensationPoints());
     validTeams[0]->addStrength(validTeams[0]->getCompensationStrength());
+    delete[] validTeams;
+    delete[] ans;
 	return validTeams[0]->getID();
 }
 
