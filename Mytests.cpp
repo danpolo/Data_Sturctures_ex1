@@ -1034,7 +1034,7 @@ bool getAllPlayersTestPlayersOrder() {
         game.add_team(i, 0);
     }
 
-    const int REPETITIONS = 100;
+    const int REPETITIONS = 1000;
 
     std::random_device dev;
     std::mt19937 rng(dev());
@@ -1180,20 +1180,144 @@ bool getClosestPlayerTestFromExample() {
     game.add_player(53, 1, 1, 6, 40, false);
     game.add_player(54, 1, 1, 6, 10, false);
     game.add_player(60, 1, 1, 6, 5, false);
+    game.add_player(70, 1, 1, 6, 5, false);
     game.add_player(100, 1, 1, 8, 6, false);
     game.add_player(80, 1, 1, 10, 7, false);
     game.add_player(90, 1, 1, 10, 7, false);
-    return game.get_closest_player(21, 1).ans() == 25;// and game.get_closest_player(25, 1).ans() ==
-   // 21 and game.get_closest_player(3, 1).ans() == 4 and game.get_closest_player(4, 3).ans() == 25;
-  //  and game.get_closest_player(5, 1).ans() == 6 and game.get_closest_player(6, 1).ans() == 5 and
-  //  game.get_closest_player(24, 1).ans() == 7 and game.get_closest_player(7, 1).ans() == 8 and
-   // game.get_closest_player(8, 1).ans() == 7 and game.get_closest_player(9, 1).ans() == 10 and
-   // game.get_closest_player(10, 1).ans() == 11 and game.get_closest_player(11, 1).ans() == 12 and
-   // game.get_closest_player(12, 1).ans() == 11 and game.get_closest_player(51, 1).ans() == 52 and
-   // game.get_closest_player(52, 1).ans() == 53 and game.get_closest_player(53, 1).ans() == 52 and
-    //game.get_closest_player(54, 1).ans() == 60 and game.get_closest_player(60, 1).ans() == 70 and
-    //game.get_closest_player(70, 1).ans() == 60 and game.get_closest_player(100, 1).ans() == 80
-    //and game.get_closest_player(80, 1).ans() == 90 and game.get_closest_player(90, 1).ans() == 80;
+    return game.get_closest_player(21, 1).ans() == 25 and game.get_closest_player(25, 1).ans() ==
+    21 and game.get_closest_player(3, 1).ans() == 4 and game.get_closest_player(4, 1).ans() == 3
+    and game.get_closest_player(5, 1).ans() == 6 and game.get_closest_player(6, 1).ans() == 5 and
+    game.get_closest_player(24, 1).ans() == 7 and game.get_closest_player(7, 1).ans() == 8 and
+    game.get_closest_player(8, 1).ans() == 7 and game.get_closest_player(9, 1).ans() == 10 and
+    game.get_closest_player(10, 1).ans() == 11 and game.get_closest_player(11, 1).ans() == 12 and
+    game.get_closest_player(12, 1).ans() == 11 and game.get_closest_player(51, 1).ans() == 52 and
+    game.get_closest_player(52, 1).ans() == 53 and game.get_closest_player(53, 1).ans() == 52 and
+    game.get_closest_player(54, 1).ans() == 60 and game.get_closest_player(60, 1).ans() == 70 and
+    game.get_closest_player(70, 1).ans() == 60 and game.get_closest_player(100, 1).ans() == 80
+    and game.get_closest_player(80, 1).ans() == 90 and game.get_closest_player(90, 1).ans() == 80;
+}
+
+bool knockoutWinnerInvalidMinId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 1, 0, i, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    return game.knockout_winner(-1, 2).status() == StatusType::INVALID_INPUT;
+}
+
+bool knockoutWinnerInvalidMaxId() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 1, 0, i, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    return game.knockout_winner(1, -2).status() == StatusType::INVALID_INPUT;
+}
+
+bool knockoutWinnerMinIdBiggerThanMax() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i*11, i + 1, 1, 0, i, false);
+        }
+        game.add_player(11*(i+1), i + 1, 0, 0, 0, true);
+    }
+    return game.knockout_winner(2, 1).status() == StatusType::INVALID_INPUT;
+}
+
+bool knockoutWinnerNoValidTeam() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+
+    for (int i = 1; i <= 9; i++) {
+        game.add_player(i, 1, 1, 0, i, false);
+    }
+    game.add_player(10, 1, 0, 0, 0, true);
+
+    for (int i = 1; i <= 11; i++) {
+        game.add_player(i + 10, 2, 1, 0, i, false);
+    }
+
+    return game.knockout_winner(1, 2).status() == StatusType::FAILURE;
+}
+
+bool knockoutWinnerSuccess() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i * 11, i + 1, 1, 0, i, false);
+        }
+        game.add_player(11 * (i + 1), i + 1, 0, 0, 0, true);
+    }
+    return game.knockout_winner(1, 2).status() == StatusType::SUCCESS;
+}
+
+bool knockoutWinnerBasicTest() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i * 11, i + 1, 1, i, 0, false);
+        }
+        game.add_player(11 * (i + 1), i + 1, 0, 0, 0, true);
+    }
+    return game.knockout_winner(1, 2).ans() == 2;
+}
+
+bool knockoutWinnerBasicTestIsGameChanged() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 0);
+    game.add_team(2, 0);
+    for (int i = 0; i <= 1; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i * 11, i + 1, 1, i, 0, false);
+        }
+        game.add_player(11 * (i + 1), i + 1, 0, 0, 0, true);
+    }
+    game.knockout_winner(1, 2);
+    return game.get_all_players_count(1).ans() == 11 and game.get_all_players_count(2).ans() ==
+    11 and game.get_team_points(1).ans() == 0 and game.get_team_points(2).ans() == 0;
+}
+
+bool knockoutWinnerTestFromExample() {
+    printFunctionName(__FUNCTION__);
+    world_cup_t game = world_cup_t();
+    game.add_team(1, 20);
+    game.add_team(3, 20);
+    game.add_team(6, 5);
+    game.add_team(7, 30);
+    game.add_team(10, 11);
+    game.add_team(11, 1000);
+    int team_ids[6] = {1,3,6,7,10,11};
+    for (int i = 0; i < 6; i++) {
+        for (int j = 1; j <= 10; j++) {
+            game.add_player(j + i * 11, team_ids[i], 0, 0, 0, false);
+        }
+        game.add_player(11 * (i + 1), team_ids[i], 0, 0, 0, true);
+    }
+    return game.knockout_winner(1, 10).ans() == 3;
 }
 
 bool runAutomaticTests(const std::vector<bool(*)()>& tests) {
@@ -1303,7 +1427,14 @@ int main() {
                                               &getClosestPlayerMiddleSuccess,
                                               &getClosestPlayerFirstSuccess,
                                               &getClosestPlayerLastSuccess,
-                                              &getClosestPlayerTestFromExample};
+                                              &getClosestPlayerTestFromExample,
+                                              &knockoutWinnerInvalidMaxId,
+                                              &knockoutWinnerInvalidMaxId,
+                                              &knockoutWinnerMinIdBiggerThanMax,
+                                              &knockoutWinnerNoValidTeam, &knockoutWinnerSuccess,
+                                              &knockoutWinnerBasicTest,
+                                              &knockoutWinnerBasicTestIsGameChanged,
+                                              &knockoutWinnerTestFromExample};
 
     /*std::vector<void(*)()> manual_tests = {&testSingleRrRotationByKey,
                                            &testSingleLlRotationByKey,
