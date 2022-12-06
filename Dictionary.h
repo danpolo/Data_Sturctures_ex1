@@ -44,7 +44,6 @@ private:
         void setValue(S other_value){ value = other_value;}
         void setHeight(int new_height) {height = new_height;}
         void setBfValue(int new_bf_value) {bf_value = new_bf_value;}
-        bool isLeaf() {((right_son == nullptr)&&(left_son == nullptr));}
         T key;
         S value;
         Node* father;
