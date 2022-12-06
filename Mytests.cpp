@@ -1342,7 +1342,7 @@ bool runAutomaticTests(const std::vector<bool(*)()>& tests) {
     return all_tests_passed;
 }
 
-int main() {
+int main4() {
     std::cout << "Ignore this (Its for the colors)-> ";
     system(("chcp " + std::to_string(CP_UTF8)).c_str());
     std::cout << std::string(MAX_LINE_LENGTH + 28, '-') << std::endl;
@@ -1562,3 +1562,26 @@ int main2(){
     generalTest3();
 }
  */
+int main(){
+    world_cup_t *obj = new world_cup_t();
+    int playerId = 1;
+    StatusType res;
+    for (int teamId = 1; teamId < 10; teamId += 2)
+    {
+        res = obj->add_team(teamId, 1000 / ((6 - teamId) * (6 - teamId)));
+
+        for (int startingId = playerId; playerId < startingId + 10 + teamId; ++playerId)
+        {
+            res = obj->add_player(playerId, teamId, 1, playerId, 3, true);
+        }
+        ++playerId;
+    }
+    obj->add_team(4, 1000000);
+    obj->knockout_winner(8,9);
+    obj->knockout_winner(1,1);
+    obj->knockout_winner(2,4);
+    obj->knockout_winner(3,9);
+    obj->knockout_winner(2,8);
+    obj->knockout_winner(0,5);
+    obj->knockout_winner(1,9);
+}

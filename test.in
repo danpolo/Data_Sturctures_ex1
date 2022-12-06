@@ -48,6 +48,6 @@ get_top_scorer -1
 get_all_players_count 3
 get_all_players 4
 get_closest_player 2008 2
-knockout_winner 0 3
+knockout_winner 0 4
 remove_team 2
 remove_player 3008

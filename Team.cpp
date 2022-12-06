@@ -6,9 +6,9 @@
 Team::Team(int teamID, int points) : teamID(teamID), m_points(points), m_strength(0),
                                 m_games_played(0), m_number_of_players(0), m_goalKeeper_exist(0),
                                 m_compensation_points(0), m_compensation_strength(0),
-                                m_dict_of_players_in_team(Dictionary<int, Player*>(false)),
+                                m_dict_of_players_in_team(Dictionary<int, Player*>(false, false)),
                                 m_top_scorer_of_team(nullptr),
-                                m_dict_of_players_in_team_by_key(Dictionary<int, Player*>(true)){}
+                                m_dict_of_players_in_team_by_key(Dictionary<int, Player*>(true, false)){}
 
 
 

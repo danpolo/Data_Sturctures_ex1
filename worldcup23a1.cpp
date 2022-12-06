@@ -1,9 +1,9 @@
 #include "worldcup23a1.h"
 
-world_cup_t::world_cup_t(): m_dict_of_teams(Dictionary<int, Team*>(true)),
-                            m_dict_of_active_teams(Dictionary<int, Team*>(true)),
-                            m_dict_of_players_by_value(Dictionary<int, Player*>(false)),
-                            m_dict_of_players_by_key(Dictionary<int, Player*>(true)),
+world_cup_t::world_cup_t(): m_dict_of_teams(Dictionary<int, Team*>(true, false)),
+                            m_dict_of_active_teams(Dictionary<int, Team*>(true, false)),
+                            m_dict_of_players_by_value(Dictionary<int, Player*>(false, true)),
+                            m_dict_of_players_by_key(Dictionary<int, Player*>(true, false)),
                             m_top_scorer(nullptr),
                             m_teams_total(0),m_active_teams_total(0), m_players_total(0)
 {
@@ -136,14 +136,14 @@ StatusType world_cup_t::remove_player(int playerId)
         return StatusType::FAILURE;
     }
     if (temp_player == m_top_scorer){
-        m_top_scorer = m_dict_of_players_by_value.findFatherValue(m_top_scorer);
+        m_top_scorer = temp_player->getClosestLeft();
     }
     int player_team_id = temp_player->getTeamID();
     StatusType ans = m_dict_of_players_by_value.remove(playerId, temp_player);
     if (ans != StatusType::SUCCESS){
         return ans;
     }
-    Player* temp_player_left = temp_player->getClosestLeft();
+    Player* temp_player_left = temp_player->getClosestLeft();    //maybe uneccesary
     Player* temp_player_right = temp_player->getClosestRight();
     temp_player->setClosestLeft(nullptr);
     temp_player->setClosestRight(nullptr);
@@ -185,11 +185,22 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
     Team* temp_team = m_dict_of_active_teams.find(temp_player->getTeamID());
     temp_team->remove_player_in_team(playerId, temp_player);
     m_dict_of_players_by_value.remove(playerId, temp_player);
+    if (temp_player == m_top_scorer){
+        m_top_scorer = temp_player->getClosestLeft();
+    }
     temp_player->addGoals(scoredGoals);
     temp_player->addGamesPlayed(gamesPlayed); // check if the value is zero, then need to set not add
     temp_player->addCards(cardsReceived);
     temp_team->add_player_in_team(playerId, temp_player);
     m_dict_of_players_by_value.insert(playerId, temp_player);
+    if (m_top_scorer == nullptr){
+        m_top_scorer = temp_player;
+    }
+    else{
+        if (*m_top_scorer < *temp_player){
+            m_top_scorer = temp_player;
+        }
+    }
 //    temp_team->addStrength(temp_player->getGoals() - temp_player->getCards());
 //    if (*temp_player > *m_top_scorer){
 //        m_top_scorer = temp_player;
@@ -357,7 +368,7 @@ output_t<int> world_cup_t::get_all_players_count(int teamId)
     }
     if (teamId > 0){
         Team* temp_team = m_dict_of_teams.find(teamId);
-        if (temp_team->getID() != teamId){
+        if ((temp_team == nullptr) || (temp_team->getID() != teamId)){
             return StatusType::FAILURE;
         }
         return temp_team->numberOfPlayers();
@@ -406,15 +417,15 @@ output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
     if ((playerId <= 0) || (teamId <= 0)){
         return StatusType::INVALID_INPUT;
     }
-    if (m_players_total == 1){
+    if ((m_players_total == 1) || (m_players_total == 0)){
         return StatusType::FAILURE;
     }
 	Team* curr_team = m_dict_of_active_teams.find(teamId);
-    if (curr_team->getID() != teamId) {
+    if ((curr_team == nullptr) || (curr_team->getID() != teamId)) {
         return StatusType::FAILURE;
     }
     Player* curr_player = curr_team->findPlayerByKey(playerId);
-    if (curr_player->getPlayerId() != playerId){
+    if ((curr_player == nullptr) || (curr_player->getPlayerId() != playerId)){
         return StatusType::FAILURE;
     }
     if (curr_player->getClosestLeft() == nullptr) {
@@ -479,6 +490,8 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
                     validTeams[i]->addCompensationStrength(validTeams[i + 1]->getStrength() * -1);
                     validTeams[i + 1]->addPoints(validTeams[i + 1]->getCompensationPoints());
                     validTeams[i + 1]->addStrength(validTeams[i + 1]->getCompensationStrength());
+                    validTeams[i + 1]->addCompensationPoints((-1) * validTeams[i + 1]->getCompensationPoints());
+                    validTeams[i + 1]->addCompensationStrength((-1) * validTeams[i + 1]->getCompensationStrength());
                     validTeams[i + 1] = nullptr;
                 } else {
                     validTeams[i + 1]->addPoints(validTeams[i]->getPoints());
@@ -487,6 +500,8 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
                     validTeams[i + 1]->addCompensationStrength(validTeams[i]->getStrength() * -1);
                     validTeams[i]->addPoints(validTeams[i]->getCompensationPoints());
                     validTeams[i]->addStrength(validTeams[i]->getCompensationStrength());
+                    validTeams[i]->addCompensationPoints((-1) * validTeams[i]->getCompensationPoints());
+                    validTeams[i]->addCompensationStrength((-1) * validTeams[i]->getCompensationStrength());
                     validTeams[i] = nullptr;
                 }
                 temp_valid_counter--;
@@ -510,6 +525,8 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
         }
         validTeams[0]->addPoints(validTeams[0]->getCompensationPoints());
         validTeams[0]->addStrength(validTeams[0]->getCompensationStrength());
+        validTeams[0]->addCompensationPoints((-1) * validTeams[0]->getCompensationPoints());
+        validTeams[0]->addCompensationStrength((-1) * validTeams[0]->getCompensationStrength());
         int winner = validTeams[0]->getID();
         delete[] decreasing_valid_teams;
         return winner;

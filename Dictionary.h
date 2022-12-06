@@ -10,7 +10,9 @@ const int LEAF_SON_HEIGHT = -1;
 template<class KEY, class VALUE>
 class Dictionary {
 public:
-    Dictionary(bool is_sorted_by_key) : is_sorted_by_key(is_sorted_by_key), root(nullptr),
+    Dictionary(bool is_sorted_by_key, bool is_all_players) : is_sorted_by_key(is_sorted_by_key),
+                                        is_all_players_in_tournment(is_all_players),
+                                        root(nullptr),
                                         counter_for_arrays(0), length(0){};
 
     void print();         //just for check
@@ -56,6 +58,7 @@ private:
     };
 
     bool is_sorted_by_key;
+    bool is_all_players_in_tournment;
     Node<KEY, VALUE>* root;
     int counter_for_arrays;
     int length;
@@ -234,34 +237,40 @@ private:
             return current_root;
         }
         if (*temp > *value_to_find) {
-            close_right = temp;
-            if (temp->getClosestLeft() == nullptr){
-                temp->setClosestLeft(value_to_find);
-            }
-            else{
-                if ((*value_to_find) > (*(temp->getClosestLeft()))){
+            if (is_all_players_in_tournment) {
+                close_right = temp;
+                if (temp->getClosestLeft() == nullptr) {
                     temp->setClosestLeft(value_to_find);
+                } else {
+                    if ((*value_to_find) > (*(temp->getClosestLeft()))) {
+                        temp->setClosestLeft(value_to_find);
+                    }
                 }
             }
             if (current_root->left_son == nullptr) {
-                value_to_find->setClosestLeft(close_left);
-                value_to_find->setClosestRight(close_right);
+                if (is_all_players_in_tournment) {
+                    value_to_find->setClosestLeft(close_left);
+                    value_to_find->setClosestRight(close_right);
+                }
                 return current_root;
             }
             return findNodeByValue(current_root->left_son, value_to_find, close_left, close_right);
         }
-        close_left = temp;
-        if (temp->getClosestRight() == nullptr){
-            temp->setClosestRight(value_to_find);
-        }
-        else{
-            if ((*value_to_find) < (*(temp->getClosestRight()))){
+        if (is_all_players_in_tournment) {
+            close_left = temp;
+            if (temp->getClosestRight() == nullptr) {
                 temp->setClosestRight(value_to_find);
+            } else {
+                if ((*value_to_find) < (*(temp->getClosestRight()))) {
+                    temp->setClosestRight(value_to_find);
+                }
             }
         }
         if (current_root->right_son == nullptr) {
-            value_to_find->setClosestLeft(close_left);
-            value_to_find->setClosestRight(close_right);
+            if (is_all_players_in_tournment) {
+                value_to_find->setClosestLeft(close_left);
+                value_to_find->setClosestRight(close_right);
+            }
             return current_root;
         }
         return findNodeByValue(current_root->right_son, value_to_find, close_left, close_right);
@@ -281,6 +290,7 @@ private:
             return;
         }
         if (curr->key < compMin){
+            getAllNodesBetween(curr->right_son, ans, compMin, compMax);
             return;
         }
         getAllNodesBetween(curr->left_son, ans, compMin, compMax);
