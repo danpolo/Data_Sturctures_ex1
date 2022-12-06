@@ -1,7 +1,6 @@
 //
 // Created by itayi on 21/11/2022.
 //
-
 #include "Team.h"
 
 Team::Team(int teamID, int points) : teamID(teamID), m_points(points), m_strength(0),
@@ -11,6 +10,12 @@ Team::Team(int teamID, int points) : teamID(teamID), m_points(points), m_strengt
                                 m_top_scorer_of_team(nullptr),
                                 m_dict_of_players_in_team_by_key(Dictionary<int, Player*>(true)){}
 
+
+
+Team::~Team() {
+    m_dict_of_players_in_team_by_key.destroyNodes();
+    m_dict_of_players_in_team.destroyNodes();
+}
 
 int Team::valueOfTeam() const {
     return m_strength + m_points;
@@ -160,20 +165,20 @@ int Team::getTopScorerInTeam() const {
 int *Team::getAllPlayersInTeam() {
     return m_dict_of_players_in_team.inorderNodesByKey();
 }
-
 bool operator!=(const Team& v1, const Team& v2){
     return !(v1 == v2);
 }
 bool operator<(const Team& v1, const Team& v2){
     return v2 > v1;
 }
+
 Team operator-(const Team& v1, const Team& v2){
     return Team(v1) -= v2;
 }
-
 Team &Team::operator-=(const Team &other) {  //useless
     return *this;
 }
+
 bool  Team::operator/(const Team &other) const { //useless
     return true;
 }

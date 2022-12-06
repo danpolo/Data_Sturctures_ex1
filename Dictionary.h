@@ -25,6 +25,8 @@ public:
     VALUE findClosestRight(VALUE value);
     VALUE findFatherValue(VALUE value);
     bool isExist(KEY key, VALUE value = nullptr);
+    void destroyNodes();
+    void destroyNodesAndContent();
 
 private:
 
@@ -456,7 +458,38 @@ private:
         length += 1;
         return StatusType::SUCCESS;
     }
+
+    void innerDestroyNodes(Node<KEY, VALUE>* current_node){
+        if (current_node == nullptr){
+            return;
+        }
+        innerDestroyNodes(current_node->left_son);
+        Node<KEY, VALUE>* right_son = current_node->right_son;
+        delete current_node;
+        innerDestroyNodes(right_son);
+    }
+
+    void innerDestroyNodesAndContent(Node<KEY, VALUE>* current_node){
+        if (current_node == nullptr){
+            return;
+        }
+        innerDestroyNodesAndContent(current_node->left_son);
+        Node<KEY, VALUE>* right_son = current_node->right_son;
+        delete current_node->value;
+        delete current_node;
+        innerDestroyNodesAndContent(right_son);
+    }
 };
+
+template<class KEY, class VALUE>
+void Dictionary<KEY, VALUE>::destroyNodesAndContent() {
+    innerDestroyNodesAndContent(root);
+}
+
+template<class KEY, class VALUE>
+void Dictionary<KEY, VALUE>::destroyNodes() {
+    innerDestroyNodes(root);
+}
 
 
 template<class KEY, class VALUE>

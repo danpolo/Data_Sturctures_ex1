@@ -35,7 +35,7 @@ public:
 	// <DO-NOT-MODIFY> {
 	
 	world_cup_t();
-	virtual ~world_cup_t();
+	~world_cup_t();
 	
 	StatusType add_team(int teamId, int points);
 	

@@ -13,10 +13,11 @@ class Team
 public:
     Team(int teamID, int points = 0);
     Team(const Team& other) = default;
+    ~Team();
     StatusType add_player_in_team(int playerID, Player* pl);
     StatusType remove_player_in_team(int playerID, Player* pl);
-    void move_all_players(Team* team2);
 
+    void move_all_players(Team* team2);
     int valueOfTeam() const;   //points + strength
     int getPoints() const;
     int getStrength() const;
@@ -38,15 +39,14 @@ public:
     int getCompensationPoints() const;
     void addCompensationPoints(int points);
     int getCompensationStrength() const;
-    void addCompensationStrength(int strength);
 
+    void addCompensationStrength(int strength);
     void setClosestLeft(Team* other);
     void setClosestRight(Team* other);
     Team* getClosestLeft();
     Team* getClosestRight();
-    //Output_t<int> getTopScorer();
 
-    ~Team() = default;
+    //Output_t<int> getTopScorer();
 
 private:
     int teamID;
@@ -58,8 +58,8 @@ private:
     int m_compensation_points;
     int m_compensation_strength;
     Dictionary<int, Player*> m_dict_of_players_in_team;
-    Dictionary<int, Player*> m_dict_of_players_in_team_by_key;
     Player* m_top_scorer_of_team;
+    Dictionary<int, Player*> m_dict_of_players_in_team_by_key;
 };
 bool operator!=(const Team& v1, const Team& v2);
 bool operator<(const Team& v1, const Team& v2);

@@ -12,7 +12,10 @@ world_cup_t::world_cup_t(): m_dict_of_teams(Dictionary<int, Team*>(true)),
 
 world_cup_t::~world_cup_t()
 {
-	// TODO: Your code goes here
+    m_dict_of_active_teams.destroyNodes();
+    m_dict_of_teams.destroyNodesAndContent();
+    m_dict_of_players_by_value.destroyNodes();
+    m_dict_of_players_by_key.destroyNodesAndContent();
 }
 
 
