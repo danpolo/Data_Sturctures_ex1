@@ -189,7 +189,9 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
         m_top_scorer = temp_player->getClosestLeft();
     }
     temp_player->addGoals(scoredGoals);
-    temp_player->addGamesPlayed(gamesPlayed); // check if the value is zero, then need to set not add
+    temp_player->addGamesPlayed(gamesPlayed+temp_team->getGamesPlayed()); // check if the value is zero, then
+    // need to set
+    // not add
     temp_player->addCards(cardsReceived);
     temp_team->add_player_in_team(playerId, temp_player);
     m_dict_of_players_by_value.insert(playerId, temp_player);

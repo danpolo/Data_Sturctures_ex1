@@ -54,7 +54,6 @@ void Team::move_all_players(Team *team2) {   //maybe need to catch an allocation
         (*moving_players)->addGamesPlayed(team2->m_games_played);
         add_player_in_team((*moving_players)->getPlayerId(), *moving_players);
         (*moving_players)->setTeamID(getID());
-        (*moving_players)->addGamesPlayed(team2->getGamesPlayed());
         team2->remove_player_in_team((*moving_players)->getPlayerId(), *moving_players);
         i++;
         moving_players++;

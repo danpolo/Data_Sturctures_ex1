@@ -411,7 +411,7 @@ private:
         VALUE temp_value = ro->value;
         VALUE temp_close_righty = nearest->value->getClosestRight();
         VALUE temp_close_lefty = ro->value->getClosestLeft();
-        if (temp_close_lefty != nullptr){
+        if (is_all_players_in_tournment && (temp_close_lefty != nullptr)){
             temp_close_lefty->setClosestRight(nearest->value);
         }
         ro->setKey(nearest->key);
