@@ -140,7 +140,7 @@ StatusType Team::remove_player_in_team(int playerID, Player* pl){
     int player_strength = pl->getCards() - pl->getGoals();
     bool is_player_gk = pl->isGk();
     bool is_top = (m_top_scorer_of_team == pl);
-    Player* father = m_dict_of_players_in_team.findFatherValue(pl);
+    Player* father = m_dict_of_players_in_team.findClosestLeft(pl);
     StatusType ans = m_dict_of_players_in_team.remove(playerID, pl);
     if (ans != StatusType::SUCCESS){
         return ans;

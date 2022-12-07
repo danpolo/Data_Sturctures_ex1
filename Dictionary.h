@@ -24,8 +24,6 @@ public:
     int getCounterForArray();  //usefull for knockout only
     VALUE find(KEY key);
     VALUE findClosestLeft(VALUE value);
-    VALUE findClosestRight(VALUE value);
-    VALUE findFatherValue(VALUE value);
     bool isExist(KEY key, VALUE value = nullptr);
     void destroyNodes();
     void destroyNodesAndContent();
@@ -568,10 +566,20 @@ VALUE Dictionary<KEY, VALUE>::find(KEY key){
 }
 
 template<class KEY, class VALUE>
-VALUE Dictionary<KEY, VALUE>::findFatherValue(VALUE value){
-    Node<KEY, VALUE>* temp = findNodeByValue(root, value, nullptr, nullptr, false)->father;
-    if (temp == nullptr){
+VALUE Dictionary<KEY, VALUE>::findClosestLeft(VALUE value){
+    Node<KEY, VALUE> *temp = findNodeByValue(root, value, nullptr, nullptr, false);
+    if (temp == nullptr) {
         return nullptr;
+    }
+    if (temp->left_son == nullptr){
+        if (temp->father == nullptr){
+            return nullptr;
+        }
+        return temp->father->value;
+    }
+    temp = temp->left_son;
+    while (temp->right_son != nullptr){
+        temp = temp->right_son;
     }
     return temp->value;
 }
