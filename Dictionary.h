@@ -226,7 +226,7 @@ private:
     }
 
     Node<KEY, VALUE>* findNodeByValue(Node<KEY, VALUE>* current_root, VALUE value_to_find, VALUE
-    close_left, VALUE close_right){
+    close_left, VALUE close_right, bool is_insert){
         if (current_root == nullptr) {
             return nullptr;
         }
@@ -237,7 +237,7 @@ private:
             return current_root;
         }
         if (*temp > *value_to_find) {
-            if (is_all_players_in_tournment) {
+            if (is_all_players_in_tournment && is_insert) {
                 close_right = temp;
                 if (temp->getClosestLeft() == nullptr) {
                     temp->setClosestLeft(value_to_find);
@@ -248,15 +248,15 @@ private:
                 }
             }
             if (current_root->left_son == nullptr) {
-                if (is_all_players_in_tournment) {
+                if (is_all_players_in_tournment && is_insert) {
                     value_to_find->setClosestLeft(close_left);
                     value_to_find->setClosestRight(close_right);
                 }
                 return current_root;
             }
-            return findNodeByValue(current_root->left_son, value_to_find, close_left, close_right);
+            return findNodeByValue(current_root->left_son, value_to_find, close_left, close_right, is_insert);
         }
-        if (is_all_players_in_tournment) {
+        if (is_all_players_in_tournment && is_insert) {
             close_left = temp;
             if (temp->getClosestRight() == nullptr) {
                 temp->setClosestRight(value_to_find);
@@ -267,13 +267,13 @@ private:
             }
         }
         if (current_root->right_son == nullptr) {
-            if (is_all_players_in_tournment) {
+            if (is_all_players_in_tournment && is_insert) {
                 value_to_find->setClosestLeft(close_left);
                 value_to_find->setClosestRight(close_right);
             }
             return current_root;
         }
-        return findNodeByValue(current_root->right_son, value_to_find, close_left, close_right);
+        return findNodeByValue(current_root->right_son, value_to_find, close_left, close_right, is_insert);
     }
 
     void getAllNodes(Node<KEY, VALUE>* curr, VALUE* ans){
@@ -330,14 +330,16 @@ private:
                 ro->father->setRight(nullptr);
             }
             stabilizeTree(ro->father, false);
-            if (ro->value->getClosestLeft() != nullptr) {
-                ro->value->getClosestLeft()->setClosestRight(ro->value->getClosestRight());
+            if (is_all_players_in_tournment) {
+                if (ro->value->getClosestLeft() != nullptr) {
+                    ro->value->getClosestLeft()->setClosestRight(ro->value->getClosestRight());
+                }
+                if (ro->value->getClosestRight() != nullptr) {
+                    ro->value->getClosestRight()->setClosestLeft(ro->value->getClosestLeft());
+                }
+                ro->value->setClosestRight(nullptr);
+                ro->value->setClosestLeft(nullptr);
             }
-            if (ro->value->getClosestRight() != nullptr) {
-                ro->value->getClosestRight()->setClosestLeft(ro->value->getClosestLeft());
-            }
-            ro->value->setClosestRight(nullptr);
-            ro->value->setClosestLeft(nullptr);
             //log(n) + log(n), maybe a problem with complexity
             delete ro;
             length -= 1;
@@ -359,14 +361,16 @@ private:
             }
             stabilizeTree(ro->father, false);
             //log(n) + log(n), maybe a problem with complexity
-            if (ro->value->getClosestLeft() != nullptr) {
-                ro->value->getClosestLeft()->setClosestRight(ro->value->getClosestRight());
+            if (is_all_players_in_tournment) {
+                if (ro->value->getClosestLeft() != nullptr) {
+                    ro->value->getClosestLeft()->setClosestRight(ro->value->getClosestRight());
+                }
+                if (ro->value->getClosestRight() != nullptr) {
+                    ro->value->getClosestRight()->setClosestLeft(ro->value->getClosestLeft());
+                }
+                ro->value->setClosestRight(nullptr);
+                ro->value->setClosestLeft(nullptr);
             }
-            if (ro->value->getClosestRight() != nullptr) {
-                ro->value->getClosestRight()->setClosestLeft(ro->value->getClosestLeft());
-            }
-            ro->value->setClosestRight(nullptr);
-            ro->value->setClosestLeft(nullptr);
             delete ro;
             length -= 1;
             return;
@@ -387,14 +391,16 @@ private:
             }
             stabilizeTree(ro->father, false);
             //log(n) + log(n), maybe a problem with complexity
-            if (ro->value->getClosestLeft() != nullptr) {
-                ro->value->getClosestLeft()->setClosestRight(ro->value->getClosestRight());
+            if (is_all_players_in_tournment) {
+                if (ro->value->getClosestLeft() != nullptr) {
+                    ro->value->getClosestLeft()->setClosestRight(ro->value->getClosestRight());
+                }
+                if (ro->value->getClosestRight() != nullptr) {
+                    ro->value->getClosestRight()->setClosestLeft(ro->value->getClosestLeft());
+                }
+                ro->value->setClosestRight(nullptr);
+                ro->value->setClosestLeft(nullptr);
             }
-            if (ro->value->getClosestRight() != nullptr) {
-                ro->value->getClosestRight()->setClosestLeft(ro->value->getClosestLeft());
-            }
-            ro->value->setClosestRight(nullptr);
-            ro->value->setClosestLeft(nullptr);
             delete ro;
             length -= 1;
             return;
@@ -405,15 +411,22 @@ private:
         }
         KEY temp_key = ro->key;
         VALUE temp_value = ro->value;
-        VALUE temp_close_righty = ro->value->getClosestRight();
+        VALUE temp_close_righty = nearest->value->getClosestRight();
+        VALUE temp_close_lefty = ro->value->getClosestLeft();
+        if (temp_close_lefty != nullptr){
+            temp_close_lefty->setClosestRight(nearest->value);
+        }
         ro->setKey(nearest->key);
         ro->setValue(nearest->value);
-        ro->value->setClosestLeft(nearest->value->getClosestLeft());
-        ro->value->setClosestRight(nearest->value);
+        if (is_all_players_in_tournment) {
+            ro->value->setClosestLeft(temp_close_lefty);
+        }
         nearest->setKey(temp_key);
         nearest->setValue(temp_value);
-        nearest->value->setClosestLeft(ro->value);
-        nearest->value->setClosestRight(temp_close_righty);
+        if (is_all_players_in_tournment) {
+            nearest->value->setClosestLeft(ro->value);
+            nearest->value->setClosestRight(temp_close_righty);
+        }
         removeNode(nearest);
     }
 
@@ -451,7 +464,7 @@ private:
         VALUE closest_left = nullptr;
         VALUE closest_right = nullptr;
         Node<KEY, VALUE>* optional_father = findNodeByValue(root, value, closest_left,
-                                                            closest_right);
+                                                            closest_right, true);
         Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, optional_father);
         // try catch to allocation error?
         //son->setClosestBig(optional_father->getInheritClosestBig());
@@ -535,7 +548,7 @@ StatusType Dictionary<KEY, VALUE>::remove(KEY key, VALUE value) {
         removeNode(temp);
         return StatusType::SUCCESS;
     }
-    Node<KEY, VALUE> *temp = findNodeByValue(root, value, nullptr, nullptr);
+    Node<KEY, VALUE> *temp = findNodeByValue(root, value, nullptr, nullptr, false);
     if (*temp->value != *value)
     {
         return StatusType::FAILURE;
@@ -556,7 +569,7 @@ VALUE Dictionary<KEY, VALUE>::find(KEY key){
 
 template<class KEY, class VALUE>
 VALUE Dictionary<KEY, VALUE>::findFatherValue(VALUE value){
-    Node<KEY, VALUE>* temp = findNodeByValue(root, value, nullptr, nullptr)->father;
+    Node<KEY, VALUE>* temp = findNodeByValue(root, value, nullptr, nullptr, false)->father;
     if (temp == nullptr){
         return nullptr;
     }
@@ -575,21 +588,11 @@ bool Dictionary<KEY, VALUE>::isExist(KEY key, VALUE value){
         }
         return false;
     }
-    Node<KEY, VALUE> *temp = findNodeByValue(root, value, nullptr, nullptr);
+    Node<KEY, VALUE> *temp = findNodeByValue(root, value, nullptr, nullptr, false);
     if (temp->key == key){
         return true;
     }
     return false;
-}
-template<class KEY, class VALUE>
-VALUE Dictionary<KEY, VALUE>::findClosestLeft(VALUE value) {
-    Node<KEY, VALUE>* temp = findNodeByValue(root, value, nullptr, nullptr);
-    return temp->getClosestSmall();
-}
-template<class KEY, class VALUE>
-VALUE Dictionary<KEY, VALUE>::findClosestRight(VALUE value) {
-    Node<KEY, VALUE>* temp = findNodeByValue(root, value, nullptr, nullptr);
-    return temp->getClosestBig();
 }
 
 //template<class KEY, class VALUE>

@@ -143,16 +143,16 @@ StatusType world_cup_t::remove_player(int playerId)
     if (ans != StatusType::SUCCESS){
         return ans;
     }
-    Player* temp_player_left = temp_player->getClosestLeft();    //maybe uneccesary
-    Player* temp_player_right = temp_player->getClosestRight();
-    temp_player->setClosestLeft(nullptr);
-    temp_player->setClosestRight(nullptr);
-    if (temp_player_left != nullptr) {
-        temp_player_left->setClosestRight(temp_player_right);
-    }
-    if (temp_player_right != nullptr) {
-        temp_player_right->setClosestLeft(temp_player_left);
-    }
+//    Player* temp_player_left = temp_player->getClosestLeft();    //maybe uneccesary
+//    Player* temp_player_right = temp_player->getClosestRight();
+//    temp_player->setClosestLeft(nullptr);
+//    temp_player->setClosestRight(nullptr);
+//    if (temp_player_left != nullptr) {
+//        temp_player_left->setClosestRight(temp_player_right);
+//    }
+//    if (temp_player_right != nullptr) {
+//        temp_player_right->setClosestLeft(temp_player_left);
+//    }
     StatusType ans2 = m_dict_of_players_by_key.remove(playerId, temp_player);
     if (ans2 != StatusType::SUCCESS){
         return ans2;
