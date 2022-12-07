@@ -51,6 +51,7 @@ void Team::move_all_players(Team *team2) {   //maybe need to catch an allocation
     int number_of_players_to_move = team2->numberOfPlayers();
     int i = 0;
     while (i < number_of_players_to_move){
+        (*moving_players)->addGamesPlayed(team2->m_games_played);
         add_player_in_team((*moving_players)->getPlayerId(), *moving_players);
         (*moving_players)->setTeamID(getID());
         (*moving_players)->addGamesPlayed(team2->getGamesPlayed());
@@ -130,6 +131,7 @@ StatusType Team::add_player_in_team(int playerID, Player *pl){
     if (pl->isGk()){
         m_goalKeeper_exist += 1;
     }
+    pl->addGamesPlayed(-m_games_played);
     return ans;
 }
 
