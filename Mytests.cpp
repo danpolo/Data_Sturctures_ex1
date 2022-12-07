@@ -10,6 +10,8 @@
 #include "Player.h"
 #include "worldcup23a1.h"
 
+#define REQUIRE(x) std::cout << (x)
+
 
 const int MAX_LINE_LENGTH = 75;
 
@@ -1562,7 +1564,7 @@ int main2(){
     generalTest3();
 }
  */
-int main(){
+int main5(){
     world_cup_t *obj = new world_cup_t();
     int playerId = 1;
     StatusType res;
@@ -1584,4 +1586,126 @@ int main(){
     obj->knockout_winner(2,8);
     obj->knockout_winner(0,5);
     obj->knockout_winner(1,9);
+}
+
+int main() {
+    world_cup_t game = world_cup_t();
+    StatusType res = game.add_team(1, 10000);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_team(2, 20000);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_team(3, 30000);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_team(4, 40000);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1001, 1, 10, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1002, 1, 10, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1003, 1, 10, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1004, 1, 10, 0, 2, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1005, 1, 10, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1006, 1, 10, 4, 3, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1007, 1, 10, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(1007);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(1002);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1008, 1, 10, 0, 0, true);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1009, 1, 10, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1010, 1, 10, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1011, 1, 10, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(1001);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(1012, 1, 10, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+
+    res = game.add_player(2001, 2, 20, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(2002, 2, 20, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(2003, 2, 20, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(2004, 2, 20, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(2005, 2, 20, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(1011);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(2006, 2, 20, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(2007, 2, 20, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(2008, 2, 20, 6, 4, true);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(2009, 2, 20, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(2001);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(2010, 2, 0, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(2011, 2, 20, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(2010);
+    REQUIRE(res == StatusType::SUCCESS);
+
+    res = game.add_player(3001, 3, 30, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(3002, 3, 30, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(3003, 3, 30, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(3004, 3, 30, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(3005, 3, 30, 2, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(3006, 3, 30, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(3007, 3, 30, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(3008, 3, 30, 0, 0, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(3009, 3, 30, 0, 2, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(3010, 3, 30, 0, 0, true);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(3011, 3, 30, 0, 0, true);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3011);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3008);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3002);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3010);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3009);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3005);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3004);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3006);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3007);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3001);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.remove_player(3003);
+    REQUIRE(res == StatusType::SUCCESS);
+
+    res = game.add_player(4001, 4, 2, 1, 2, false);
+    REQUIRE(res == StatusType::SUCCESS);
+    res = game.add_player(4002, 4, 2, 2, 2, false);
+    REQUIRE(res == StatusType::SUCCESS);
+
 }

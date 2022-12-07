@@ -478,6 +478,11 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
             begin++;
         }
         delete[] ans;
+        if (valid_counter == 1) {
+            int winner = validTeams[0]->getID();
+            delete[] validTeams;
+            return winner;
+        }
         while (valid_counter != 1) {
             temp_valid_counter = valid_counter;
             for (int i = 0; i < valid_counter - 1; i += 2) {
