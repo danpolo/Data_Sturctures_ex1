@@ -1,7 +1,3 @@
-//
-// Created by itayi on 21/11/2022.
-//
-
 #ifndef EX1_TEAM_H
 #define EX1_TEAM_H
 
@@ -45,8 +41,6 @@ public:
     void setClosestRight(Team* other);
     Team* getClosestLeft();
     Team* getClosestRight();
-
-    //Output_t<int> getTopScorer();
 
 private:
     int teamID;

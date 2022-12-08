@@ -1,6 +1,3 @@
-//
-// Created by itayi on 21/11/2022.
-//
 #include "Team.h"
 
 Team::Team(int teamID, int points) : teamID(teamID), m_points(points), m_strength(0),
@@ -9,7 +6,6 @@ Team::Team(int teamID, int points) : teamID(teamID), m_points(points), m_strengt
                                 m_dict_of_players_in_team(Dictionary<int, Player*>(false, false)),
                                 m_top_scorer_of_team(nullptr),
                                 m_dict_of_players_in_team_by_key(Dictionary<int, Player*>(true, false)){}
-
 
 
 Team::~Team() {
@@ -45,7 +41,7 @@ void Team::addPoints(int points) {
     m_points += points;
 }
 
-void Team::move_all_players(Team *team2) {   //maybe need to catch an allocation error
+void Team::move_all_players(Team *team2) {
     Player** moving_players_begin = team2->m_dict_of_players_in_team.inorderNodesByValue();
     Player** moving_players = moving_players_begin;
     int number_of_players_to_move = team2->numberOfPlayers();
@@ -178,11 +174,11 @@ bool operator<(const Team& v1, const Team& v2){
 Team operator-(const Team& v1, const Team& v2){
     return Team(v1) -= v2;
 }
-Team &Team::operator-=(const Team &other) {  //useless
+Team &Team::operator-=(const Team &other) {
     return *this;
 }
 
-bool  Team::operator/(const Team &other) const { //useless
+bool  Team::operator/(const Team &other) const {
     return true;
 }
 

@@ -78,22 +78,7 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
             delete temp_player;
             return ans1;
         }
-        /*
-        Player* temp_player_left = m_dict_of_players_by_value.findClosestLeft(temp_player);
-        Player* temp_player_right = m_dict_of_players_by_value.findClosestRight(temp_player);
-        temp_player->setClosestLeft(temp_player_left);
-        temp_player->setClosestRight(temp_player_right);
-        if ((temp_player_left != nullptr) and (temp_player_left->getClosestRight() == nullptr or
-        ((*temp_player - *temp_player_left) / (*temp_player_left->getClosestRight() -
-        *temp_player_left)))){
-            temp_player_left->setClosestRight(temp_player);
-        }
-        if ((temp_player_right != nullptr) and (temp_player_right->getClosestLeft() == nullptr or
-        ((*temp_player - *temp_player_right) / (*temp_player_right->getClosestLeft() -
-        *temp_player_right)))) {
-            temp_player_right->setClosestLeft(temp_player);
-        }
-        */
+
         Team* temp_team = m_dict_of_teams.find(teamId);
         if (temp_team == nullptr || temp_team->getID() != teamId){
             return StatusType::FAILURE;
@@ -151,22 +136,11 @@ StatusType world_cup_t::remove_player(int playerId)
     if (ans != StatusType::SUCCESS){
         return ans;
     }
-//    Player* temp_player_left = temp_player->getClosestLeft();    //maybe uneccesary
-//    Player* temp_player_right = temp_player->getClosestRight();
-//    temp_player->setClosestLeft(nullptr);
-//    temp_player->setClosestRight(nullptr);
-//    if (temp_player_left != nullptr) {
-//        temp_player_left->setClosestRight(temp_player_right);
-//    }
-//    if (temp_player_right != nullptr) {
-//        temp_player_right->setClosestLeft(temp_player_left);
-//    }
     StatusType ans2 = m_dict_of_players_by_key.remove(playerId, temp_player);
     if (ans2 != StatusType::SUCCESS){
         return ans2;
     }
     Team* temp_team = m_dict_of_active_teams.find(player_team_id);
-    //Maybe here there's a problem with complexity, but active_teams maybe solves it
     ans = temp_team->remove_player_in_team(playerId, temp_player);
     if (ans != StatusType::SUCCESS){
         return ans;
@@ -203,9 +177,7 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
         m_top_scorer = temp_player->getClosestLeft();
     }
     temp_player->addGoals(scoredGoals);
-    temp_player->addGamesPlayed(gamesPlayed+temp_team->getGamesPlayed()); // check if the value is zero, then
-    // need to set
-    // not add
+    temp_player->addGamesPlayed(gamesPlayed+temp_team->getGamesPlayed());
     temp_player->addCards(cardsReceived);
     temp_team->add_player_in_team(playerId, temp_player);
     m_dict_of_players_by_value.insert(playerId, temp_player);
@@ -217,10 +189,6 @@ StatusType world_cup_t::update_player_stats(int playerId, int gamesPlayed,
             m_top_scorer = temp_player;
         }
     }
-//    temp_team->addStrength(temp_player->getGoals() - temp_player->getCards());
-//    if (*temp_player > *m_top_scorer){
-//        m_top_scorer = temp_player;
-//    }
 	return StatusType::SUCCESS;
 }
 
@@ -262,7 +230,6 @@ output_t<int> world_cup_t::get_num_played_games(int playerId)
         return StatusType::FAILURE;
     }
     int number_of_games_in_team = m_dict_of_active_teams.find(pl->getTeamID())->getGamesPlayed();
-    //maybe there's a problem here with complexity
 	return number_of_games_in_team + pl->getGamesPlayed();
 }
 
@@ -459,7 +426,6 @@ StatusType world_cup_t::get_all_players(int teamId, int *const output)
     }
 
 	return StatusType::SUCCESS;
-    //maybe need to catch an allocation error
 }
 
 output_t<int> world_cup_t::get_closest_player(int playerId, int teamId)
@@ -502,10 +468,10 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
         delete[] ans;
         return StatusType::FAILURE;
     }
-    int valid_counter = counter;                 //signing each invalid team with nullptr
-    // maybe to "try" and "catch" here
+    int valid_counter = counter;
+
     try {
-        Team **validTeams = new Team *[valid_counter];       //building new array which will contain all valids
+        Team **validTeams = new Team *[valid_counter]; //building new array which will contain all valids
         Team **decreasing_valid_teams = nullptr;
         int j = 0, temp_valid_counter = 0;
         for (int i = 0; i < counter; i++) {
@@ -560,7 +526,6 @@ output_t<int> world_cup_t::knockout_winner(int minTeamId, int maxTeamId)
                 begin++;
             }
             delete[] validTeams;
-
 
             //releasing certain values in validTeams will release also in decreasing_valid_teams
             valid_counter = temp_valid_counter;

@@ -15,7 +15,6 @@ public:
                                         root(nullptr),
                                         counter_for_arrays(0), length(0){};
 
-    void print();         //just for check
     StatusType insert(KEY key, VALUE value);
     StatusType remove(KEY key, VALUE value);
     VALUE* inorderNodesByValue();
@@ -82,7 +81,6 @@ private:
     }
 
     void stabilizeTree(Node<KEY, VALUE>* node, bool is_insert=true) {
-        //return; //REMOVE
         if (node == nullptr) {
             return;
         }
@@ -112,7 +110,7 @@ private:
         }
         node->setHeight(getHeight(node));
 
-        if (node->father == nullptr || (is_insert && old_height == node->height)) { // ||
+        if (node->father == nullptr || (is_insert && old_height == node->height)) {
             return;
         }
 
@@ -338,7 +336,6 @@ private:
                 ro->value->setClosestRight(nullptr);
                 ro->value->setClosestLeft(nullptr);
             }
-            //log(n) + log(n), maybe a problem with complexity
             delete ro;
             length -= 1;
             return;
@@ -358,7 +355,6 @@ private:
                 }
             }
             stabilizeTree(ro->father, false);
-            //log(n) + log(n), maybe a problem with complexity
             if (is_all_players_in_tournment) {
                 if (ro->value->getClosestLeft() != nullptr) {
                     ro->value->getClosestLeft()->setClosestRight(ro->value->getClosestRight());
@@ -428,25 +424,12 @@ private:
         removeNode(nearest);
     }
 
-    void printAll(Node<KEY, VALUE>* ro){             //Just for check
-        if (ro == nullptr)
-        {
-            return;
-        }
-        printAll(ro->left_son);
-        std::cout << "Key: " << ro->key << ", Height: " << ro->height << ", BF: " << ro->bf_value <<
-        std::endl;
-        printAll(ro->right_son);
-    }
-
-
     StatusType insertKey(KEY key, VALUE value){
         Node<KEY, VALUE>* optional_father = findNodeByKey(root, key);
         if (key == optional_father->key){
             return StatusType::FAILURE;
         }
         Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, optional_father);
-        // try catch to allocation error?
         if (key < optional_father->key){
             optional_father->setLeft(son);
         }
@@ -464,11 +447,7 @@ private:
         Node<KEY, VALUE>* optional_father = findNodeByValue(root, value, closest_left,
                                                             closest_right, true);
         Node<KEY, VALUE>* son = new Node<KEY, VALUE>(key, value, optional_father);
-        // try catch to allocation error?
-        //son->setClosestBig(optional_father->getInheritClosestBig());
-        //son->setClosestSmall(optional_father->getInheritClosestSmall());
-        //optional_father->setInheritClosestSmall(nullptr);
-        //optional_father->setInheritClosestBig(nullptr);
+
         if (*value < *optional_father->value){
             optional_father->setLeft(son);
         }
@@ -603,23 +582,6 @@ bool Dictionary<KEY, VALUE>::isExist(KEY key, VALUE value){
     return false;
 }
 
-//template<class KEY, class VALUE>
-//VALUE Dictionary<KEY, VALUE>::getFarRight() {
-//    Node<KEY, VALUE>* temp = root;
-//    if (temp == nullptr){
-//        return nullptr;
-//    }
-//    while (temp->right_son != nullptr){
-//        temp = temp->right_son;
-//    }
-//    return temp->value;
-//}
-
-template<class T, class S>
-void Dictionary<T, S>::print() {
-    printAll(root);
-}
-
 template<class T, class S>
 S* Dictionary<T, S>::inorderNodesByValue() {
     S* ans = new S[length];
@@ -639,7 +601,6 @@ T* Dictionary<T, S>::inorderNodesByKey() {
 template<class T, class S>
 S* Dictionary<T, S>::inorderNodesByValueBetween(T keyMin, T keyMax) {
     S* ans = new S[length];
-    //maybe the space complexity here is a problem
     counter_for_arrays = 0;
     getAllNodesBetween(root, ans, keyMin, keyMax);
     return ans;

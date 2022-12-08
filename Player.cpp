@@ -35,7 +35,7 @@ bool Player::operator>(const Player& other) const{
     return player_id > other.player_id;
 }
 
-bool Player::operator<(const Player& other) const {     //maybe duplication of code
+bool Player::operator<(const Player& other) const {
     if (goals != other.goals) {
         return goals < other.goals;
     }
