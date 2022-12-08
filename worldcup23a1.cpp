@@ -6,8 +6,7 @@ world_cup_t::world_cup_t(): m_dict_of_teams(Dictionary<int, Team*>(true, false))
                             m_dict_of_players_by_value(Dictionary<int, Player*>(false, true)),
                             m_dict_of_players_by_key(Dictionary<int, Player*>(true, false)),
                             m_top_scorer(nullptr),
-                            m_teams_total(0), m_active_teams_total(0), m_valid_teams_total(0), m_players_total(0)
-{}
+                            m_teams_total(0), m_active_teams_total(0), m_valid_teams_total(0), m_players_total(0) {}
 
 world_cup_t::~world_cup_t()
 {
@@ -302,6 +301,12 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
                 m_dict_of_active_teams.remove(teamId2, team2);
                 m_active_teams_total -= 1;
             }
+            if (team1->isValidTeam()){
+                if (!(m_dict_of_valid_teams.isExist(teamId1))){
+                    m_dict_of_valid_teams.insert(teamId1, team1);
+                    m_valid_teams_total += 1;
+                }
+            }
             m_dict_of_teams.remove(teamId2, team2);
             m_teams_total -= 1;
             team1->addPoints(team2->getPoints());
@@ -317,6 +322,12 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
                 if (m_dict_of_active_teams.isExist(teamId1)){
                     m_dict_of_active_teams.remove(teamId1, team1);
                     m_active_teams_total -= 1;
+                }
+                if (team2->isValidTeam()){
+                    if (!(m_dict_of_valid_teams.isExist(teamId2))){
+                        m_dict_of_valid_teams.insert(teamId2, team2);
+                        m_valid_teams_total += 1;
+                    }
                 }
                 m_dict_of_teams.remove(teamId1, team1);
                 m_teams_total -= 1;
@@ -355,6 +366,12 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
                 return ans2;
             }
             m_active_teams_total += 1;
+        }
+        if (added_team->isValidTeam()){
+            if (!(m_dict_of_valid_teams.isExist(newTeamId))){
+                m_dict_of_valid_teams.insert(newTeamId, added_team);
+                m_valid_teams_total += 1;
+            }
         }
         if (m_dict_of_active_teams.isExist(teamId1)){
             m_dict_of_active_teams.remove(teamId1, team1);
