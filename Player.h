@@ -1,8 +1,6 @@
 #ifndef EX1_PLAYER_H
 #define EX1_PLAYER_H
 
-#include <string>
-
 
 class Player {
 public:
