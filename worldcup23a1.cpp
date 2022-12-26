@@ -66,8 +66,8 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
         return StatusType::INVALID_INPUT;
     }
     try{
-        Team* temp_team = m_dict_of_teams.find(teamId);
-        if (temp_team == nullptr || temp_team->getID() != teamId){
+        Team* temp_team2 = m_dict_of_teams.find(teamId);
+        if (temp_team2 == nullptr || temp_team2->getID() != teamId){
             return StatusType::FAILURE;
         }
         Player* temp_player = new Player(playerId, teamId, goals, cards, gamesPlayed, goalKeeper);
@@ -81,6 +81,11 @@ StatusType world_cup_t::add_player(int playerId, int teamId, int gamesPlayed,
         if (ans1 != StatusType::SUCCESS){
             delete temp_player;
             return ans1;
+        }
+
+        Team* temp_team = m_dict_of_teams.find(teamId);
+        if (temp_team == nullptr || temp_team->getID() != teamId){
+            return StatusType::FAILURE;
         }
         ans1 = temp_team->add_player_in_team(playerId, temp_player);
         if (ans1 != StatusType::SUCCESS){
@@ -267,10 +272,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
                 m_dict_of_active_teams.remove(teamId2, team2);
                 m_active_teams_total -= 1;
             }
-            if (team1->numberOfPlayers() > 0){
-                m_dict_of_active_teams.insert(teamId1, team1);
-                m_active_teams_total+=1;
-            }
+            if (team1->numberOfPlayers() > 0){m_dict_of_active_teams.insert(teamId1, team1);m_active_teams_total+=1;}
             if (team1->isValidTeam()){
                 if (!(m_dict_of_valid_teams.isExist(teamId1))){
                     m_dict_of_valid_teams.insert(teamId1, team1);
@@ -293,10 +295,7 @@ StatusType world_cup_t::unite_teams(int teamId1, int teamId2, int newTeamId)
                     m_dict_of_active_teams.remove(teamId1, team1);
                     m_active_teams_total -= 1;
                 }
-                if (team2->numberOfPlayers() > 0){
-                    m_dict_of_active_teams.insert(teamId2, team2);
-                    m_active_teams_total+=1;
-                }
+                if (team2->numberOfPlayers() > 0){m_dict_of_active_teams.insert(teamId2, team2);m_active_teams_total+=1;}
                 if (team2->isValidTeam()){
                     if (!(m_dict_of_valid_teams.isExist(teamId2))){
                         m_dict_of_valid_teams.insert(teamId2, team2);
